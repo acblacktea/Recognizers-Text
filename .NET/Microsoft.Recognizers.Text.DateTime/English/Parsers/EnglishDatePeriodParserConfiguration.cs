@@ -9,8 +9,8 @@ namespace Microsoft.Recognizers.Text.DateTime.English
 {
     public class EnglishDatePeriodParserConfiguration : BaseOptionsConfiguration, IDatePeriodParserConfiguration
     {
-        public static readonly Regex PastPrefixRegex =
-            new Regex(DateTimeDefinitions.PastPrefixRegex, RegexOptions.Singleline);
+        public static readonly Regex PreviousPrefixRegex =
+            new Regex(DateTimeDefinitions.PreviousPrefixRegex, RegexOptions.Singleline);
 
         public static readonly Regex ThisPrefixRegex =
             new Regex(DateTimeDefinitions.ThisPrefixRegex, RegexOptions.Singleline);
@@ -59,7 +59,7 @@ namespace Microsoft.Recognizers.Text.DateTime.English
             MonthWithYear = EnglishDatePeriodExtractorConfiguration.MonthWithYear;
             MonthNumWithYear = EnglishDatePeriodExtractorConfiguration.MonthNumWithYear;
             YearRegex = EnglishDatePeriodExtractorConfiguration.YearRegex;
-            PastRegex = EnglishDatePeriodExtractorConfiguration.PastPrefixRegex;
+            PastRegex = EnglishDatePeriodExtractorConfiguration.PreviousPrefixRegex;
             FutureRegex = EnglishDatePeriodExtractorConfiguration.NextPrefixRegex;
             FutureSuffixRegex = EnglishDatePeriodExtractorConfiguration.FutureSuffixRegex;
             NumberCombinedWithUnit = EnglishDurationExtractorConfiguration.NumberCombinedWithDurationUnit;
@@ -88,6 +88,7 @@ namespace Microsoft.Recognizers.Text.DateTime.English
             LessThanRegex = EnglishDatePeriodExtractorConfiguration.LessThanRegex;
             MoreThanRegex = EnglishDatePeriodExtractorConfiguration.MoreThanRegex;
             CenturySuffixRegex = EnglishDatePeriodExtractorConfiguration.CenturySuffixRegex;
+            NowRegex = EnglishDatePeriodExtractorConfiguration.NowRegex;
             UnitMap = config.UnitMap;
             CardinalMap = config.CardinalMap;
             DayOfMonth = config.DayOfMonth;
@@ -194,9 +195,11 @@ namespace Microsoft.Recognizers.Text.DateTime.English
 
         public Regex CenturySuffixRegex { get; }
 
+        public Regex NowRegex { get; }
+
         Regex IDatePeriodParserConfiguration.NextPrefixRegex => NextPrefixRegex;
 
-        Regex IDatePeriodParserConfiguration.PastPrefixRegex => PastPrefixRegex;
+        Regex IDatePeriodParserConfiguration.PreviousPrefixRegex => PreviousPrefixRegex;
 
         Regex IDatePeriodParserConfiguration.ThisPrefixRegex => ThisPrefixRegex;
 
@@ -236,7 +239,7 @@ namespace Microsoft.Recognizers.Text.DateTime.English
             {
                 swift = 1;
             }
-            else if (PastPrefixRegex.IsMatch(trimmedText))
+            else if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }
@@ -258,7 +261,7 @@ namespace Microsoft.Recognizers.Text.DateTime.English
             {
                 swift = 1;
             }
-            else if (PastPrefixRegex.IsMatch(trimmedText))
+            else if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }

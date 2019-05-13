@@ -92,7 +92,7 @@ SeasonRegex: !nestedRegex
   def: \b(?<season>(([uú]ltim[oa]|[nd]?es[st][ea]|n?[oa]|(pr[oó]xim[oa]s?|seguinte))\s+)?(?<seas>primavera|ver[ãa]o|outono|inverno)((\s+)?(seguinte|((de\s+|,)?\s*{YearRegex})|((do\s+)?(?<order>pr[oó]ximo|[uú]ltimo|[nd]?es[st]e)\s+ano)))?)\b
   references: [ YearRegex ]
 WhichWeekRegex: !simpleRegex
-  def: (semana)(\s*)(?<number>\d\d|\d|0\d)
+  def: \b(semana)(\s*)(?<number>5[0-3]|[1-4]\d|0?[1-9])\b
 WeekOfRegex: !simpleRegex
   def: (semana)(\s*)((do|da|de))
 MonthOfRegex: !simpleRegex
@@ -101,6 +101,9 @@ RangeUnitRegex: !simpleRegex
   def: \b(?<unit>anos|ano|meses|m[êe]s|semanas|semana)\b
 InConnectorRegex: !simpleRegex
   def: \b(em)\b
+SinceYearSuffixRegex: !simpleRegex
+  # TODO: modify below regex according to the counterpart in English
+  def: ^[.]
 WithinNextPrefixRegex: !simpleRegex
   # TODO: modify below regex according to the counterpart in English
   def: ^[.]
@@ -141,6 +144,9 @@ ForTheRegex: !simpleRegex
   # TODO: modify below regex according to the counterpart in English
   def: .^
 WeekDayAndDayOfMonthRegex: !simpleRegex
+  # TODO: modify below regex according to the counterpart in English
+  def: .^
+WeekDayAndDayRegex: !simpleRegex
   # TODO: modify below regex according to the counterpart in English
   def: .^
 WeekDayOfMonthRegex: !nestedRegex
@@ -752,10 +758,18 @@ DateTokenPrefix: 'em '
 TimeTokenPrefix: 'as '
 TokenBeforeDate: 'o '
 TokenBeforeTime: 'as '
-NextPrefixRegex: !simpleRegex
-  def: (pr[oó]xim[oa]|seguinte)\b
+UpcomingPrefixRegex: !simpleRegex
+  def: .^
+# TODO: modify below regex according to the counterpart in English
+NextPrefixRegex: !nestedRegex
+  def: (pr[oó]xim[oa]|seguinte|{UpcomingPrefixRegex})\b
+  references: [ UpcomingPrefixRegex ]
 PastPrefixRegex: !simpleRegex
-  def: ([uú]ltim[oa])\b
+  def: .^
+# TODO: modify below regex according to the counterpart in English
+PreviousPrefixRegex: !nestedRegex
+  def: ([uú]ltim[oa]|{PastPrefixRegex})\b
+  references: [PastPrefixRegex]
 ThisPrefixRegex: !simpleRegex
   def: ([nd]?es[st][ea])\b
 RelativeDayRegex: !simpleRegex
@@ -813,7 +827,7 @@ RelativeDecadeRegex: !simpleRegex
 YearSuffix: !nestedRegex
   def: (,?\s*({YearRegex}|{FullTextYearRegex}))
   references: [ YearRegex, FullTextYearRegex ]
-YearAfterRegex: !simpleRegex
+SuffixAfterRegex: !simpleRegex
   # TODO: modify below regex according to the counterpart in English
   def: ^[.]
 YearPeriodRegex: !simpleRegex
@@ -925,4 +939,18 @@ YearToDateTerms: !list
     - anos ate agora
     - anos ate hoje
     - anos ate a data
+SpecialCharactersEquivalent: !dictionary
+  types: [ char, char ]
+  entries:
+    á: a
+    é: e
+    í: i
+    ó: o
+    ú: u
+    ê: e
+    ô: o
+    ü: u
+    ã: a
+    õ: o
+    ç: c
 ...

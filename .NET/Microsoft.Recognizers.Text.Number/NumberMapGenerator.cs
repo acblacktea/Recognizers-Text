@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace Microsoft.Recognizers.Text.Number
 {
-    public class NumberMapGenerator
+    public static class NumberMapGenerator
     {
         public static ImmutableDictionary<string, long> InitOrdinalNumberMap(Dictionary<string, long> ordinalNumberMap, Dictionary<string, long> prefixCardinalMap, Dictionary<string, long> suffixOrdinalMap)
         {
-            var simpleOrdinalDictionary = ordinalNumberMap.ToDictionary(entry => entry.Key,
-                              entry => entry.Value);
+            var simpleOrdinalDictionary = ordinalNumberMap.ToDictionary(
+                                          entry => entry.Key, entry => entry.Value);
 
             foreach (var suffix in suffixOrdinalMap)
             {

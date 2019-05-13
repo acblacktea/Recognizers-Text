@@ -18,14 +18,21 @@ namespace Microsoft.Recognizers.Text.Number.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            base.TestSpecInitialize(TestResources);
+            TestSpecInitialize(TestResources);
         }
 
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.CSV", "NumberModel-Korean.csv", "NumberModel-Korean#csv", DataAccessMethod.Sequential)]
         [TestMethod]
         public void NumberModel()
         {
-            base.TestNumber();
+            TestNumber();
+        }
+
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.CSV", "OrdinalModel-Korean.csv", "OrdinalModel-Korean#csv", DataAccessMethod.Sequential)]
+        [TestMethod]
+        public void OrdinalModel()
+        {
+            TestNumber();
         }
     }
 }

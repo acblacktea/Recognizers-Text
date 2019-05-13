@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-
 using Microsoft.Recognizers.Definitions.Spanish;
 using Microsoft.Recognizers.Text.DateTime.Utilities;
 
@@ -9,6 +9,52 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
 {
     public class SpanishDateParserConfiguration : BaseOptionsConfiguration, IDateParserConfiguration
     {
+        public SpanishDateParserConfiguration(ICommonDateTimeParserConfiguration config)
+            : base(config)
+        {
+            DateTokenPrefix = DateTimeDefinitions.DateTokenPrefix;
+            DateRegexes = new SpanishDateExtractorConfiguration(this).DateRegexList;
+            OnRegex = SpanishDateExtractorConfiguration.OnRegex;
+            SpecialDayRegex = SpanishDateExtractorConfiguration.SpecialDayRegex;
+            SpecialDayWithNumRegex = SpanishDateExtractorConfiguration.SpecialDayWithNumRegex;
+            NextRegex = SpanishDateExtractorConfiguration.NextDateRegex;
+            ThisRegex = SpanishDateExtractorConfiguration.ThisRegex;
+            LastRegex = SpanishDateExtractorConfiguration.LastDateRegex;
+            UnitRegex = SpanishDateExtractorConfiguration.DateUnitRegex;
+            WeekDayRegex = SpanishDateExtractorConfiguration.WeekDayRegex;
+            MonthRegex = SpanishDateExtractorConfiguration.MonthRegex;
+            WeekDayOfMonthRegex = SpanishDateExtractorConfiguration.WeekDayOfMonthRegex;
+            ForTheRegex = SpanishDateExtractorConfiguration.ForTheRegex;
+            WeekDayAndDayOfMothRegex = SpanishDateExtractorConfiguration.WeekDayAndDayOfMothRegex;
+            WeekDayAndDayRegex = SpanishDateExtractorConfiguration.WeekDayAndDayRegex;
+            RelativeMonthRegex = SpanishDateExtractorConfiguration.RelativeMonthRegex;
+            YearSuffix = SpanishDateExtractorConfiguration.YearSuffix;
+            RelativeWeekDayRegex = SpanishDateExtractorConfiguration.RelativeWeekDayRegex;
+            RelativeDayRegex = new Regex(DateTimeDefinitions.RelativeDayRegex, RegexOptions.Singleline);
+            NextPrefixRegex = new Regex(DateTimeDefinitions.NextPrefixRegex, RegexOptions.Singleline);
+            PreviousPrefixRegex = new Regex(DateTimeDefinitions.PreviousPrefixRegex, RegexOptions.Singleline);
+            UpcomingPrefixRegex = new Regex(DateTimeDefinitions.UpcomingPrefixRegex, RegexOptions.Singleline);
+            PastPrefixRegex = new Regex(DateTimeDefinitions.PastPrefixRegex, RegexOptions.Singleline);
+            DayOfMonth = config.DayOfMonth;
+            DayOfWeek = config.DayOfWeek;
+            MonthOfYear = config.MonthOfYear;
+            CardinalMap = config.CardinalMap;
+            IntegerExtractor = config.IntegerExtractor;
+            OrdinalExtractor = config.OrdinalExtractor;
+            CardinalExtractor = config.CardinalExtractor;
+            NumberParser = config.NumberParser;
+            DurationExtractor = config.DurationExtractor;
+            DateExtractor = config.DateExtractor;
+            DurationParser = config.DurationParser;
+            UnitMap = config.UnitMap;
+            UtilityConfiguration = config.UtilityConfiguration;
+            SameDayTerms = DateTimeDefinitions.SameDayTerms.ToImmutableList();
+            PlusOneDayTerms = DateTimeDefinitions.PlusOneDayTerms.ToImmutableList();
+            PlusTwoDayTerms = DateTimeDefinitions.PlusTwoDayTerms.ToImmutableList();
+            MinusOneDayTerms = DateTimeDefinitions.MinusOneDayTerms.ToImmutableList();
+            MinusTwoDayTerms = DateTimeDefinitions.MinusTwoDayTerms.ToImmutableList();
+        }
+
         public string DateTokenPrefix { get; }
 
         public IExtractor IntegerExtractor { get; }
@@ -53,6 +99,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
 
         public Regex WeekDayAndDayOfMothRegex { get; }
 
+        public Regex WeekDayAndDayRegex { get; }
+
         public Regex RelativeMonthRegex { get; }
 
         public Regex YearSuffix { get; }
@@ -62,6 +110,10 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
         public Regex RelativeDayRegex { get; }
 
         public Regex NextPrefixRegex { get; }
+
+        public Regex PreviousPrefixRegex { get; }
+
+        public Regex UpcomingPrefixRegex { get; }
 
         public Regex PastPrefixRegex { get; }
 
@@ -85,51 +137,9 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
 
         public IDateTimeUtilityConfiguration UtilityConfiguration { get; }
 
-        public SpanishDateParserConfiguration(ICommonDateTimeParserConfiguration config) : base(config)
-        {
-            DateTokenPrefix = DateTimeDefinitions.DateTokenPrefix;
-            DateRegexes = new SpanishDateExtractorConfiguration(this).DateRegexList;
-            OnRegex = SpanishDateExtractorConfiguration.OnRegex;
-            SpecialDayRegex = SpanishDateExtractorConfiguration.SpecialDayRegex;
-            SpecialDayWithNumRegex = SpanishDateExtractorConfiguration.SpecialDayWithNumRegex;
-            NextRegex = SpanishDateExtractorConfiguration.NextDateRegex;
-            ThisRegex = SpanishDateExtractorConfiguration.ThisRegex;
-            LastRegex = SpanishDateExtractorConfiguration.LastDateRegex;
-            UnitRegex = SpanishDateExtractorConfiguration.DateUnitRegex;
-            WeekDayRegex = SpanishDateExtractorConfiguration.WeekDayRegex;
-            MonthRegex = SpanishDateExtractorConfiguration.MonthRegex;
-            WeekDayOfMonthRegex = SpanishDateExtractorConfiguration.WeekDayOfMonthRegex;
-            ForTheRegex = SpanishDateExtractorConfiguration.ForTheRegex;
-            WeekDayAndDayOfMothRegex = SpanishDateExtractorConfiguration.WeekDayAndDayOfMothRegex;
-            RelativeMonthRegex = SpanishDateExtractorConfiguration.RelativeMonthRegex;
-            YearSuffix = SpanishDateExtractorConfiguration.YearSuffix;
-            RelativeWeekDayRegex = SpanishDateExtractorConfiguration.RelativeWeekDayRegex;
-            RelativeDayRegex = new Regex(DateTimeDefinitions.RelativeDayRegex, RegexOptions.Singleline);
-            NextPrefixRegex = new Regex(DateTimeDefinitions.NextPrefixRegex, RegexOptions.Singleline);
-            PastPrefixRegex = new Regex(DateTimeDefinitions.PastPrefixRegex, RegexOptions.Singleline);
-            DayOfMonth = config.DayOfMonth;
-            DayOfWeek = config.DayOfWeek;
-            MonthOfYear = config.MonthOfYear;
-            CardinalMap = config.CardinalMap;
-            IntegerExtractor = config.IntegerExtractor;
-            OrdinalExtractor = config.OrdinalExtractor;
-            CardinalExtractor = config.CardinalExtractor;
-            NumberParser = config.NumberParser;
-            DurationExtractor = config.DurationExtractor;
-            DateExtractor = config.DateExtractor;
-            DurationParser = config.DurationParser;
-            UnitMap = config.UnitMap;
-            UtilityConfiguration = config.UtilityConfiguration;
-            SameDayTerms = DateTimeDefinitions.SameDayTerms.ToImmutableList();
-            PlusOneDayTerms = DateTimeDefinitions.PlusOneDayTerms.ToImmutableList();
-            PlusTwoDayTerms = DateTimeDefinitions.PlusTwoDayTerms.ToImmutableList();
-            MinusOneDayTerms = DateTimeDefinitions.MinusOneDayTerms.ToImmutableList();
-            MinusTwoDayTerms = DateTimeDefinitions.MinusTwoDayTerms.ToImmutableList();
-        }
-
         public int GetSwiftMonth(string text)
         {
-            var trimmedText = text.Trim().ToLowerInvariant().Normalized();
+            var trimmedText = text.Trim().ToLowerInvariant().Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
             var swift = 0;
 
             if (NextPrefixRegex.IsMatch(trimmedText))
@@ -137,7 +147,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
                 swift = 1;
             }
 
-            if (PastPrefixRegex.IsMatch(trimmedText))
+            if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }
@@ -147,26 +157,13 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
 
         public bool IsCardinalLast(string text)
         {
-            var trimmedText = text.Trim().ToLowerInvariant().Normalized();
-            return PastPrefixRegex.IsMatch(trimmedText);
+            var trimmedText = text.Trim().ToLowerInvariant().Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
+            return PreviousPrefixRegex.IsMatch(trimmedText);
         }
-        
+
         public string Normalize(string text)
         {
-            return text.Normalized();
-        }
-    }
-
-    public static class StringExtension
-    {
-        public static string Normalized(this string text)
-        {
-            return text
-                .Replace('á', 'a')
-                .Replace('é', 'e')
-                .Replace('í', 'i')
-                .Replace('ó', 'o')
-                .Replace('ú', 'u');
+            return text.Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
         }
     }
 }

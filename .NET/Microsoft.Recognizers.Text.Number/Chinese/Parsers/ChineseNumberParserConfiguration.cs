@@ -10,7 +10,8 @@ namespace Microsoft.Recognizers.Text.Number.Chinese
 {
     public class ChineseNumberParserConfiguration : ICJKNumberParserConfiguration
     {
-        public ChineseNumberParserConfiguration() : this(new CultureInfo(Culture.Chinese))
+        public ChineseNumberParserConfiguration()
+               : this(new CultureInfo(Culture.Chinese))
         {
         }
 
@@ -32,6 +33,8 @@ namespace Microsoft.Recognizers.Text.Number.Chinese
 
             CardinalNumberMap = new Dictionary<string, long>().ToImmutableDictionary();
             OrdinalNumberMap = new Dictionary<string, long>().ToImmutableDictionary();
+            RelativeReferenceOffsetMap = NumbersDefinitions.RelativeReferenceOffsetMap.ToImmutableDictionary();
+            RelativeReferenceRelativeToMap = NumbersDefinitions.RelativeReferenceRelativeToMap.ToImmutableDictionary();
             RoundNumberMap = NumbersDefinitions.RoundNumberMap.ToImmutableDictionary();
             ZeroToNineMap = NumbersDefinitions.ZeroToNineMap.ToImmutableDictionary();
             RoundNumberMapChar = NumbersDefinitions.RoundNumberMapChar.ToImmutableDictionary();
@@ -101,6 +104,12 @@ namespace Microsoft.Recognizers.Text.Number.Chinese
 
         public ImmutableDictionary<string, long> OrdinalNumberMap { get; private set; }
 
+        public ImmutableDictionary<string, string> RelativeReferenceMap { get; private set; }
+
+        public ImmutableDictionary<string, string> RelativeReferenceOffsetMap { get; private set; }
+
+        public ImmutableDictionary<string, string> RelativeReferenceRelativeToMap { get; private set; }
+
         public ImmutableDictionary<string, long> CardinalNumberMap { get; private set; }
 
         public ImmutableDictionary<string, long> RoundNumberMap { get; private set; }
@@ -135,6 +144,17 @@ namespace Microsoft.Recognizers.Text.Number.Chinese
         public long ResolveCompositeNumber(string numberStr)
         {
             return 0;
+        }
+
+        // Handle cases like "last", "next one", "previous one"
+        public string ResolveSpecificString(string numberStr)
+        {
+            if (this.RelativeReferenceMap.ContainsKey(numberStr))
+            {
+                return this.RelativeReferenceMap[numberStr];
+            }
+
+            return string.Empty;
         }
     }
 }

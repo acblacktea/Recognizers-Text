@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.Recognizers.Text.DateTime.Utilities;
-using System.Collections.Immutable;
 
 namespace Microsoft.Recognizers.Text.DateTime
 {
@@ -23,6 +23,8 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         Regex WeekDayAndDayOfMonthRegex { get; }
 
+        Regex WeekDayAndDayRegex { get; }
+
         Regex RelativeMonthRegex { get; }
 
         Regex WeekDayRegex { get; }
@@ -36,6 +38,8 @@ namespace Microsoft.Recognizers.Text.DateTime
         Regex LessThanRegex { get; }
 
         Regex InConnectorRegex { get; }
+
+        Regex SinceYearSuffixRegex { get; }
 
         Regex RangeUnitRegex { get; }
 

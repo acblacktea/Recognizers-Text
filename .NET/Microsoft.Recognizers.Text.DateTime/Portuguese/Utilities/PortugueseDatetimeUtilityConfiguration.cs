@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Microsoft.Recognizers.Definitions;
+
 using Microsoft.Recognizers.Definitions.Portuguese;
 using Microsoft.Recognizers.Text.DateTime.Utilities;
 
@@ -13,6 +13,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese.Utilities
 
         public static readonly Regex InConnectorRegex = new Regex(DateTimeDefinitions.InConnectorRegex, RegexOptions.Singleline);
 
+        public static readonly Regex SinceYearSuffixRegex = new Regex(DateTimeDefinitions.SinceYearSuffixRegex, RegexOptions.Singleline);
+
         public static readonly Regex WithinNextPrefixRegex = new Regex(DateTimeDefinitions.WithinNextPrefixRegex, RegexOptions.Singleline);
 
         public static readonly Regex AmDescRegex = new Regex(DateTimeDefinitions.AmDescRegex, RegexOptions.Singleline);
@@ -23,10 +25,12 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese.Utilities
 
         public static readonly Regex RangeUnitRegex = new Regex(DateTimeDefinitions.RangeUnitRegex, RegexOptions.Singleline);
 
-        public static readonly Regex TimeUnitRegex = new Regex(DateTimeDefinitions.TimeUnitRegex,
+        public static readonly Regex TimeUnitRegex = new Regex(
+            DateTimeDefinitions.TimeUnitRegex,
             RegexOptions.Singleline);
 
-        public static readonly Regex DateUnitRegex = new Regex(DateTimeDefinitions.DateUnitRegex,
+        public static readonly Regex DateUnitRegex = new Regex(
+            DateTimeDefinitions.DateUnitRegex,
             RegexOptions.Singleline);
 
         public static readonly Regex CommonDatePrefixRegex = new Regex(DateTimeDefinitions.CommonDatePrefixRegex, RegexOptions.Singleline);
@@ -36,6 +40,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese.Utilities
         Regex IDateTimeUtilityConfiguration.AgoRegex => AgoRegex;
 
         Regex IDateTimeUtilityConfiguration.InConnectorRegex => InConnectorRegex;
+
+        Regex IDateTimeUtilityConfiguration.SinceYearSuffixRegex => SinceYearSuffixRegex;
 
         Regex IDateTimeUtilityConfiguration.WithinNextPrefixRegex => WithinNextPrefixRegex;
 
@@ -52,6 +58,5 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese.Utilities
         Regex IDateTimeUtilityConfiguration.DateUnitRegex => DateUnitRegex;
 
         Regex IDateTimeUtilityConfiguration.CommonDatePrefixRegex => CommonDatePrefixRegex;
-
     }
 }

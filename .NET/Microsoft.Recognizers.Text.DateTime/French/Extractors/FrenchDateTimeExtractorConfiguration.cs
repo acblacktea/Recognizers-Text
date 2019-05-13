@@ -46,11 +46,23 @@ namespace Microsoft.Recognizers.Text.DateTime.French
         public static readonly Regex UnitRegex =
             new Regex(DateTimeDefinitions.TimeUnitRegex, RegexOptions.Singleline);
 
+        public static readonly Regex ConnectorRegex =
+            new Regex(DateTimeDefinitions.ConnectorRegex, RegexOptions.Singleline);
+
         public static readonly Regex NumberAsTimeRegex =
             new Regex(DateTimeDefinitions.NumberAsTimeRegex, RegexOptions.Singleline);
 
         public static readonly Regex DateNumberConnectorRegex =
             new Regex(DateTimeDefinitions.DateNumberConnectorRegex, RegexOptions.Singleline);
+
+        public static readonly Regex YearRegex =
+            new Regex(DateTimeDefinitions.YearRegex, RegexOptions.Singleline);
+
+        public static readonly Regex YearSuffix =
+            new Regex(DateTimeDefinitions.YearSuffix, RegexOptions.Singleline);
+
+        public static readonly Regex SuffixAfterRegex =
+            new Regex(DateTimeDefinitions.SuffixAfterRegex, RegexOptions.Singleline);
 
         public FrenchDateTimeExtractorConfiguration(IOptionsConfiguration config)
             : base(config)
@@ -94,13 +106,17 @@ namespace Microsoft.Recognizers.Text.DateTime.French
 
         Regex IDateTimeExtractorConfiguration.DateNumberConnectorRegex => DateNumberConnectorRegex;
 
+        Regex IDateTimeExtractorConfiguration.YearRegex => YearRegex;
+
+        Regex IDateTimeExtractorConfiguration.YearSuffix => YearSuffix;
+
+        Regex IDateTimeExtractorConfiguration.SuffixAfterRegex => SuffixAfterRegex;
+
         public IDateTimeExtractor DurationExtractor { get; }
 
         public bool IsConnector(string text)
         {
-            return string.IsNullOrEmpty(text) || text.Equals(",") ||
-                        PrepositionRegex.IsMatch(text) || text.Equals("t") || text.Equals("pour") ||
-                        text.Equals("vers");
+            return string.IsNullOrEmpty(text) || PrepositionRegex.IsMatch(text) || ConnectorRegex.IsMatch(text);
         }
     }
 }

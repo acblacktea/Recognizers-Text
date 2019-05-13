@@ -109,7 +109,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         return self._next_prefix_regex
 
     @property
-    def past_prefix_regex(self) -> Pattern:
+    def previous_prefix_regex(self) -> Pattern:
         return self._past_prefix_regex
 
     @property
@@ -156,6 +156,10 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
     def unit_map(self) -> Dict[str, str]:
         return self._unit_map
 
+    @property
+    def now_regex(self) -> Pattern:
+        return self._now_regex
+
     def __init__(self, config: BaseDateParserConfiguration):
         self._date_extractor = config.date_extractor
         self._date_parser = config.date_parser
@@ -169,7 +173,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._month_with_year = RegExpUtility.get_safe_reg_exp(EnglishDateTime.MonthWithYear)
         self._month_num_with_year = RegExpUtility.get_safe_reg_exp(EnglishDateTime.MonthNumWithYear)
         self._year_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.YearRegex)
-        self._past_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.PastPrefixRegex)
+        self._past_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.PreviousPrefixRegex)
         self._future_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.NextPrefixRegex)
         self._in_connector_regex = config.utility_configuration.in_connector_regex
         self._week_of_month_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.WeekOfMonthRegex)
@@ -182,7 +186,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._month_of_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.MonthOfRegex)
         self._which_week_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.WhichWeekRegex)
         self._next_prefix_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.NextPrefixRegex)
-        self._past_prefix_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.PastPrefixRegex)
+        self._past_prefix_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.PreviousPrefixRegex)
         self._this_prefix_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.ThisPrefixRegex)
         self._rest_of_date_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.RestOfDateRegex)
         self._later_early_period_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.LaterEarlyPeriodRegex)
@@ -194,6 +198,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._cardinal_map = config.cardinal_map
         self._season_map = config.season_map
         self._unit_map = config.unit_map
+        self._now_regex = RegExpUtility.get_safe_reg_exp(EnglishDateTime.NowRegex)
 
     def get_swift_day_or_month(self, source: str) -> int:
         trimmed_source = source.strip().lower()
@@ -201,7 +206,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
 
         if self.next_prefix_regex.search(trimmed_source):
             swift = 1
-        elif self.past_prefix_regex.search(trimmed_source):
+        elif self.previous_prefix_regex.search(trimmed_source):
             swift = -1
 
         return swift
@@ -212,7 +217,7 @@ class EnglishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
 
         if self.next_prefix_regex.search(trimmed_source):
             swift = 1
-        elif self.past_prefix_regex.search(trimmed_source):
+        elif self.previous_prefix_regex.search(trimmed_source):
             swift = -1
         elif self.this_prefix_regex.search(trimmed_source):
             swift = 0

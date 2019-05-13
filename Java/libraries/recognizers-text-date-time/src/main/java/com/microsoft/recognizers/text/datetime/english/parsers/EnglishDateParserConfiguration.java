@@ -5,6 +5,7 @@ import com.microsoft.recognizers.text.IExtractor;
 import com.microsoft.recognizers.text.IParser;
 import com.microsoft.recognizers.text.datetime.config.BaseOptionsConfiguration;
 import com.microsoft.recognizers.text.datetime.english.extractors.EnglishDateExtractorConfiguration;
+import com.microsoft.recognizers.text.datetime.extractors.IDateExtractor;
 import com.microsoft.recognizers.text.datetime.extractors.IDateTimeExtractor;
 import com.microsoft.recognizers.text.datetime.parsers.IDateTimeParser;
 import com.microsoft.recognizers.text.datetime.parsers.config.ICommonDateTimeParserConfiguration;
@@ -63,7 +64,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
 
         relativeDayRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.RelativeDayRegex);
         nextPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.NextPrefixRegex);
-        pastPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PastPrefixRegex);
+        previousPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PreviousPrefixRegex);
         sameDayTerms = Collections.unmodifiableList(EnglishDateTime.SameDayTerms);
         plusOneDayTerms = Collections.unmodifiableList(EnglishDateTime.PlusOneDayTerms);
         plusTwoDayTerms = Collections.unmodifiableList(EnglishDateTime.PlusTwoDayTerms);
@@ -78,7 +79,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
     private final IExtractor cardinalExtractor;
     private final IParser numberParser;
     private final IDateTimeExtractor durationExtractor;
-    private final IDateTimeExtractor dateExtractor;
+    private final IDateExtractor dateExtractor;
     private final IDateTimeParser durationParser;
     private final Iterable<Pattern> dateRegexes;
 
@@ -116,7 +117,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
     // If the spanish date parser need the same regexes, they should be extracted
     private final Pattern relativeDayRegex;
     private final Pattern nextPrefixRegex;
-    private final Pattern pastPrefixRegex;
+    private final Pattern previousPrefixRegex;
 
     @Override
     public String getDateTokenPrefix() {
@@ -149,7 +150,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
     }
 
     @Override
-    public IDateTimeExtractor getDateExtractor() {
+    public IDateExtractor getDateExtractor() {
         return dateExtractor;
     }
 
@@ -250,7 +251,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
 
     @Override
     public Pattern getPastPrefixRegex() {
-        return pastPrefixRegex;
+        return previousPrefixRegex;
     }
 
     @Override
@@ -309,31 +310,6 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
     }
 
     @Override
-    public Integer getSwiftDay(String text) {
-
-        String trimmedText = text.trim().toLowerCase();
-        Integer swift = 0;
-
-        Optional<Match> match = Arrays.stream(RegExpUtility.getMatches(relativeDayRegex, text)).findFirst();
-
-        if (trimmedText.equals("today")) {
-            swift = 0;
-        } else if (trimmedText.equals("tomorrow") || trimmedText.equals("tmr")) {
-            swift = 1;
-        } else if (trimmedText.equals("yesterday")) {
-            swift = -1;
-        } else if (trimmedText.endsWith("day after tomorrow") || trimmedText.endsWith("day after tmr")) {
-            swift = 2;
-        } else if (trimmedText.endsWith("day before yesterday")) {
-            swift = -2;
-        } else if (match.isPresent()) {
-            swift = getSwift(text);
-        }
-
-        return swift;
-    }
-
-    @Override
     public Integer getSwiftMonth(String text) {
         return getSwift(text);
     }
@@ -344,7 +320,7 @@ public class EnglishDateParserConfiguration extends BaseOptionsConfiguration imp
         Integer swift = 0;
 
         Optional<Match> matchNext = Arrays.stream(RegExpUtility.getMatches(nextPrefixRegex, trimmedText)).findFirst();
-        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(pastPrefixRegex, trimmedText)).findFirst();
+        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(previousPrefixRegex, trimmedText)).findFirst();
 
         if (matchNext.isPresent()) {
             swift = 1;

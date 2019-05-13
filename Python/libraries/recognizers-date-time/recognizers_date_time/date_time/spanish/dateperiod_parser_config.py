@@ -109,7 +109,7 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         return self._next_prefix_regex
 
     @property
-    def past_prefix_regex(self) -> Pattern:
+    def previous_prefix_regex(self) -> Pattern:
         return self._past_prefix_regex
 
     @property
@@ -156,6 +156,10 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
     def unit_map(self) -> Dict[str, str]:
         return self._unit_map
 
+    @property
+    def now_regex(self) -> Pattern:
+        return self._now_regex
+
     def __init__(self, config: BaseDateParserConfiguration):
         self._token_before_date = SpanishDateTime.TokenBeforeDate
         self.cardianal_extractor = config.cardinal_extractor
@@ -192,7 +196,7 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._unspecific_end_of_range_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.UnspecificEndOfRangeRegex)
 
         self._next_prefix_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.NextPrefixRegex)
-        self._past_prefix_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.PastPrefixRegex)
+        self._past_prefix_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.PreviousPrefixRegex)
         self._this_prefix_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.ThisPrefixRegex)
 
         self._in_connector_regex = config.utility_configuration.in_connector_regex
@@ -201,6 +205,7 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._day_of_month = config.day_of_month
         self._month_of_year = config.month_of_year
         self._season_map = config.season_map
+        self._now_regex = RegExpUtility.get_safe_reg_exp(SpanishDateTime.NowRegex)
 
     def get_swift_day_or_month(self, source: str) -> int:
         trimmed_source = source.strip().lower()
@@ -208,7 +213,7 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
 
         if self.next_prefix_regex.search(trimmed_source):
             swift = 1
-        elif self.past_prefix_regex.search(trimmed_source):
+        elif self.previous_prefix_regex.search(trimmed_source):
             swift = -1
 
         return swift
@@ -220,7 +225,7 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         if self.next_prefix_regex.search(trimmed_source):
             swift = 1
 
-        if self.past_prefix_regex.search(trimmed_source):
+        if self.previous_prefix_regex.search(trimmed_source):
             swift = -1
         elif self.this_prefix_regex.search(trimmed_source):
             swift = 0
@@ -258,4 +263,4 @@ class SpanishDatePeriodParserConfiguration(DatePeriodParserConfiguration):
 
     def is_last_cardinal(self, source: str) -> bool:
         trimmed_source = source.strip().lower()
-        return not self.past_prefix_regex.search(trimmed_source) is None
+        return not self.previous_prefix_regex.search(trimmed_source) is None

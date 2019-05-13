@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -7,7 +7,7 @@ using DateObject = System.DateTime;
 
 namespace Microsoft.Recognizers.Text.DateTime
 {
-    public class DateTimeFormatUtil
+    public static class DateTimeFormatUtil
     {
         private static readonly Regex HourTimexRegex = new Regex(@"(?<!P)T(\d{2})");
         private static readonly Regex WeekDayTimexRegex = new Regex(@"XXXX-WXX-(\d)");
@@ -242,8 +242,9 @@ namespace Microsoft.Recognizers.Text.DateTime
         public static string ToIsoWeekTimex(DateObject date)
         {
             var cal = DateTimeFormatInfo.InvariantInfo.Calendar;
+            var thursday = cal.AddDays(date, DayOfWeek.Thursday - cal.GetDayOfWeek(date));
 
-            return $"{date.Year:D4}-W{cal.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday):D2}";
+            return $"{thursday.Year:D4}-W{cal.GetWeekOfYear(thursday, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday):D2}";
         }
     }
 }

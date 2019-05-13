@@ -448,4 +448,12 @@ public class ChineseNumeric {
             .replace("{TillRegex}", TillRegex);
 
     public static final String AmbiguousFractionConnectorsRegex = "^[.]";
+
+    public static final ImmutableMap<String, String> RelativeReferenceOffsetMap = ImmutableMap.<String, String>builder()
+        .put("", "")
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceRelativeToMap = ImmutableMap.<String, String>builder()
+        .put("", "")
+        .build();
 }

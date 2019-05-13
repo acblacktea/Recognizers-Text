@@ -52,11 +52,11 @@ export class BaseMergedExtractor implements IDateTimeExtractor {
         let result: Array<ExtractResult> = new Array<ExtractResult>();
         this.addTo(result, this.config.dateExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.timeExtractor.extract(source, referenceDate), source);
-        this.addTo(result, this.config.durationExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.datePeriodExtractor.extract(source, referenceDate), source);
-        this.addTo(result, this.config.dateTimeExtractor.extract(source, referenceDate), source);
+        this.addTo(result, this.config.durationExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.timePeriodExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.dateTimePeriodExtractor.extract(source, referenceDate), source);
+        this.addTo(result, this.config.dateTimeExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.setExtractor.extract(source, referenceDate), source);
         this.addTo(result, this.config.holidayExtractor.extract(source, referenceDate), source);
 
@@ -168,26 +168,33 @@ export class BaseMergedExtractor implements IDateTimeExtractor {
         let lastEnd = 0;
         ers.forEach(er => {
             let beforeStr = source.substr(lastEnd, er.start).toLowerCase();
+            let isSuccess = false;
             let before = this.hasTokenIndex(beforeStr.trim(), this.config.beforeRegex);
             if (before.matched) {
                 let modLength = beforeStr.length - before.index;
                 er.length += modLength;
                 er.start -= modLength;
                 er.text = source.substr(er.start, er.length);
+                isSuccess = true;
             }
-            let after = this.hasTokenIndex(beforeStr.trim(), this.config.afterRegex);
-            if (after.matched) {
-                let modLength = beforeStr.length - after.index;
-                er.length += modLength;
-                er.start -= modLength;
-                er.text = source.substr(er.start, er.length);
+            if(!isSuccess){
+                let after = this.hasTokenIndex(beforeStr.trim(), this.config.afterRegex);
+                if (after.matched) {
+                    let modLength = beforeStr.length - after.index;
+                    er.length += modLength;
+                    er.start -= modLength;
+                    er.text = source.substr(er.start, er.length);
+                    isSuccess = true;
+                }
             }
-            let since = this.hasTokenIndex(beforeStr.trim(), this.config.sinceRegex);
-            if (since.matched) {
-                let modLength = beforeStr.length - since.index;
-                er.length += modLength;
-                er.start -= modLength;
-                er.text = source.substr(er.start, er.length);
+            if(!isSuccess){
+                let since = this.hasTokenIndex(beforeStr.trim(), this.config.sinceRegex);
+                if (since.matched) {
+                    let modLength = beforeStr.length - since.index;
+                    er.length += modLength;
+                    er.start -= modLength;
+                    er.text = source.substr(er.start, er.length);
+                }
             }
         });
     }
@@ -582,15 +589,8 @@ export class BaseMergedParser implements IDateTimeParser {
             // 1. Cases like "After January". the end of the period should be the start of the new period, not the end
             // 2. Cases like "More than 3 days after today", the date point should be the start of the new period
             if (mod === TimeTypeConstants.afterMod) {
-                // For cases like "After January" or "After 2018"
-                // The "end" of the period is not inclusive by default ("January", the end should be "XXXX-02-01" / "2018", the end should be "2019-01-01")
-                // Mod "after" is also not inclusive the "start" ("After January", the start should be "XXXX-01-31" / "After 2018", the start should be "2017-12-31")
-                // So here the START day should be the inclusive end of the period, which is one day previous to the default end (exclusive end)
                 if (!StringUtility.isNullOrEmpty(start) && !StringUtility.isNullOrEmpty(end)) {
-                    // Create the end-date with time if not included
-                    var dateObj = new Date(end.includes(':') ? end : end + ' 00:00:00');
-                    dateObj.setDate(dateObj.getDate() - 1);
-                    result[TimeTypeConstants.START] = DateTimeFormatUtil.formatDate(dateObj);
+                    result[TimeTypeConstants.START] = end;
                 } else {
                     result[TimeTypeConstants.START] = start;
                 }

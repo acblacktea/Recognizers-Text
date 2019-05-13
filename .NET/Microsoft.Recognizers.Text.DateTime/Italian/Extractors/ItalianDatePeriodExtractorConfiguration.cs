@@ -14,7 +14,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
             DateTimeDefinitions.TillRegex, // until
             RegexOptions.Singleline);
 
-        public static readonly Regex AndRegex = new Regex(
+        public static readonly Regex RangeConnectorRegex = new Regex(
             DateTimeDefinitions.RangeConnectorRegex, // and
             RegexOptions.Singleline);
 
@@ -234,6 +234,9 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
         public static readonly Regex CenturySuffixRegex =
             new Regex(DateTimeDefinitions.CenturySuffixRegex, RegexOptions.Singleline);
 
+        public static readonly Regex NowRegex =
+            new Regex(DateTimeDefinitions.NowRegex, RegexOptions.Singleline);
+
         private static readonly Regex FromRegex =
             new Regex(DateTimeDefinitions.FromRegex, RegexOptions.Singleline);
 
@@ -304,7 +307,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
 
         Regex IDatePeriodExtractorConfiguration.NumberCombinedWithDateUnit => NumberCombinedWithDateUnit;
 
-        Regex IDatePeriodExtractorConfiguration.PastRegex => PastPrefixRegex;
+        Regex IDatePeriodExtractorConfiguration.PreviousPrefixRegex => PastPrefixRegex;
 
         Regex IDatePeriodExtractorConfiguration.FutureRegex => NextPrefixRegex;
 
@@ -337,6 +340,10 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
         Regex IDatePeriodExtractorConfiguration.MoreThanRegex => MoreThanRegex;
 
         Regex IDatePeriodExtractorConfiguration.CenturySuffixRegex => CenturySuffixRegex;
+
+        Regex IDatePeriodExtractorConfiguration.MonthNumRegex => MonthNumRegex;
+
+        Regex IDatePeriodExtractorConfiguration.NowRegex => NowRegex;
 
         string[] IDatePeriodExtractorConfiguration.DurationDateRestrictions => DateTimeDefinitions.DurationDateRestrictions;
 

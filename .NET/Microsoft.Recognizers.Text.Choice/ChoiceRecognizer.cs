@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using Microsoft.Recognizers.Text.Choice.Bulgarian;
 using Microsoft.Recognizers.Text.Choice.Chinese;
 using Microsoft.Recognizers.Text.Choice.Dutch;
 using Microsoft.Recognizers.Text.Choice.English;
@@ -8,6 +8,7 @@ using Microsoft.Recognizers.Text.Choice.German;
 using Microsoft.Recognizers.Text.Choice.Japanese;
 using Microsoft.Recognizers.Text.Choice.Portuguese;
 using Microsoft.Recognizers.Text.Choice.Spanish;
+using Microsoft.Recognizers.Text.Choice.Swedish;
 
 namespace Microsoft.Recognizers.Text.Choice
 {
@@ -33,16 +34,16 @@ namespace Microsoft.Recognizers.Text.Choice
         {
         }
 
-        public IModel GetBooleanModel(string culture = null, bool fallbackToDefaultCulture = true)
-        {
-            return GetModel<BooleanModel>(culture, fallbackToDefaultCulture);
-        }
-
         public static List<ModelResult> RecognizeBoolean(string query, string culture, ChoiceOptions options = ChoiceOptions.None, bool fallbackToDefaultCulture = true)
         {
             var recognizer = new ChoiceRecognizer(options);
             var model = recognizer.GetBooleanModel(culture, fallbackToDefaultCulture);
             return model.Parse(query);
+        }
+
+        public IModel GetBooleanModel(string culture = null, bool fallbackToDefaultCulture = true)
+        {
+            return GetModel<BooleanModel>(culture, fallbackToDefaultCulture);
         }
 
         protected override void InitializeConfiguration()
@@ -78,6 +79,14 @@ namespace Microsoft.Recognizers.Text.Choice
             RegisterModel<BooleanModel>(
                 Culture.Spanish,
                 (options) => new BooleanModel(new BooleanParser(), new BooleanExtractor(new SpanishBooleanExtractorConfiguration())));
+
+            RegisterModel<BooleanModel>(
+                Culture.Swedish,
+                (options) => new BooleanModel(new BooleanParser(), new BooleanExtractor(new SwedishBooleanExtractorConfiguration())));
+
+            RegisterModel<BooleanModel>(
+                Culture.Bulgarian,
+                (options) => new BooleanModel(new BooleanParser(), new BooleanExtractor(new BulgarianBooleanExtractorConfiguration())));
         }
     }
 }

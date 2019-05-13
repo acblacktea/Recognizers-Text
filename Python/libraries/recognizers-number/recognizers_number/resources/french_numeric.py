@@ -70,7 +70,7 @@ class FrenchNumeric:
     WrittenGroupSeparatorTexts = [r'point', r'points']
     WrittenIntegerSeparatorTexts = [r'et', r'-']
     WrittenFractionSeparatorTexts = [r'et', r'sur']
-    HalfADozenRegex = f'(?<=\\b)+demi\\s+douzaine'
+    HalfADozenRegex = f'(?<=\\b)demi\\s+douzaine'
     DigitalNumberRegex = f'((?<=\\b)(cent|mille|million|millions|milliard|milliards|billions|billion|douzaine(s)?)(?=\\b))|((?<=(\\d|\\b)){BaseNumbers.MultiplierLookupRegex}(?=\\b))'
     AmbiguousFractionConnectorsRegex = f'^[.]'
     CardinalNumberMap = dict([("zéro", 0),
@@ -318,4 +318,6 @@ class FrenchNumeric:
                            ("g", 1000000000),
                            ("b", 1000000000),
                            ("t", 1000000000000)])
+    RelativeReferenceOffsetMap = dict([("", "")])
+    RelativeReferenceRelativeToMap = dict([("", "")])
 # pylint: enable=line-too-long

@@ -109,6 +109,9 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
         public static readonly Regex WeekDayAndDayOfMothRegex =
             new Regex(DateTimeDefinitions.WeekDayAndDayOfMonthRegex, RegexOptions.Singleline);
 
+        public static readonly Regex WeekDayAndDayRegex =
+            new Regex(DateTimeDefinitions.WeekDayAndDayRegex, RegexOptions.Singleline);
+
         public static readonly Regex RelativeMonthRegex =
             new Regex(
                 DateTimeDefinitions.RelativeMonthRegex,
@@ -145,6 +148,9 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
 
         public static readonly Regex InConnectorRegex =
             new Regex(DateTimeDefinitions.InConnectorRegex, RegexOptions.Singleline);
+
+        public static readonly Regex SinceYearSuffixRegex =
+            new Regex(DateTimeDefinitions.SinceYearSuffixRegex, RegexOptions.Singleline);
 
         public static readonly Regex RangeUnitRegex =
             new Regex(DateTimeDefinitions.RangeUnitRegex, RegexOptions.Singleline);
@@ -241,6 +247,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
 
         Regex IDateExtractorConfiguration.WeekDayAndDayOfMonthRegex => WeekDayAndDayOfMothRegex;
 
+        Regex IDateExtractorConfiguration.WeekDayAndDayRegex => WeekDayAndDayRegex;
+
         Regex IDateExtractorConfiguration.ForTheRegex => ForTheRegex;
 
         Regex IDateExtractorConfiguration.RelativeMonthRegex => RelativeMonthRegex;
@@ -256,6 +264,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
         Regex IDateExtractorConfiguration.MoreThanRegex => MoreThanRegex;
 
         Regex IDateExtractorConfiguration.InConnectorRegex => InConnectorRegex;
+
+        Regex IDateExtractorConfiguration.SinceYearSuffixRegex => SinceYearSuffixRegex;
 
         Regex IDateExtractorConfiguration.RangeUnitRegex => RangeUnitRegex;
 

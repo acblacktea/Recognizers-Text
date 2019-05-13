@@ -22,6 +22,8 @@ public class EnglishNumeric {
 
     public static final String ZeroToNineIntegerRegex = "(three|seven|eight|four|five|zero|nine|one|two|six)";
 
+    public static final String TwoToNineIntegerRegex = "(three|seven|eight|four|five|nine|two|six)";
+
     public static final String NegativeNumberTermsRegex = "((minus|negative)\\s+)";
 
     public static final String NegativeNumberSignRegex = "^{NegativeNumberTermsRegex}.*"
@@ -73,7 +75,18 @@ public class EnglishNumeric {
 
     public static final String RoundNumberOrdinalRegex = "(hundredth|thousandth|millionth|billionth|trillionth)";
 
-    public static final String BasicOrdinalRegex = "(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth|twentieth|thirtieth|fortieth|fiftieth|sixtieth|seventieth|eightieth|ninetieth)";
+    public static final String NumberOrdinalRegex = "(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth|twentieth|thirtieth|fortieth|fiftieth|sixtieth|seventieth|eightieth|ninetieth)";
+
+    public static final String RelativeOrdinalRegex = "((next|previous) one|(the second|next) to last|the one before the last( one)?|the last but one|(ante)?penultimate|last|next|previous)";
+
+    public static final String BasicOrdinalRegex = "({NumberOrdinalRegex}|{RelativeOrdinalRegex})"
+            .replace("{NumberOrdinalRegex}", NumberOrdinalRegex)
+            .replace("{RelativeOrdinalRegex}", RelativeOrdinalRegex);
+
+    public static final String RelativeOrdinalFilterRegex = "(?<!-)(first|{RelativeOrdinalRegex})\\s*({TwoToNineIntegerRegex}|[2-9]+)(?!\\s*{RoundNumberIntegerRegex})"
+            .replace("{RelativeOrdinalRegex}", RelativeOrdinalRegex)
+            .replace("{TwoToNineIntegerRegex}", TwoToNineIntegerRegex)
+            .replace("{RoundNumberIntegerRegex}", RoundNumberIntegerRegex);
 
     public static final String SuffixBasicOrdinalRegex = "((((({TensNumberIntegerRegex}(\\s+(and\\s+)?|\\s*-\\s*){ZeroToNineIntegerRegex})|{TensNumberIntegerRegex}|{ZeroToNineIntegerRegex}|{AnIntRegex})(\\s+{RoundNumberIntegerRegex})+)\\s+(and\\s+)?)*({TensNumberIntegerRegex}(\\s+|\\s*-\\s*))?{BasicOrdinalRegex})"
             .replace("{TensNumberIntegerRegex}", TensNumberIntegerRegex)
@@ -109,7 +122,7 @@ public class EnglishNumeric {
             .replace("{AllOrdinalRegex}", AllOrdinalRegex)
             .replace("{RoundNumberOrdinalRegex}", RoundNumberOrdinalRegex);
 
-    public static final String FractionNounWithArticleRegex = "(?<=\\b)({AllIntRegex}\\s+(and\\s+)?)?(a|an|one)(\\s+|\\s*-\\s*)(?!\\bfirst\\b|\\bsecond\\b)(({AllOrdinalRegex})|({RoundNumberOrdinalRegex})|half|quarter)(?=\\b)"
+    public static final String FractionNounWithArticleRegex = "(?<=\\b)((({AllIntRegex}\\s+(and\\s+)?)?(a|an|one)(\\s+|\\s*-\\s*)(?!\\bfirst\\b|\\bsecond\\b)(({AllOrdinalRegex})|({RoundNumberOrdinalRegex})|half|quarter))|(half))(?=\\b)"
             .replace("{AllIntRegex}", AllIntRegex)
             .replace("{AllOrdinalRegex}", AllOrdinalRegex)
             .replace("{RoundNumberOrdinalRegex}", RoundNumberOrdinalRegex);
@@ -421,5 +434,33 @@ public class EnglishNumeric {
 
     public static final ImmutableMap<String, String> AmbiguityFiltersDict = ImmutableMap.<String, String>builder()
         .put("\\bone\\b", "\\b(the|this|that|which)\\s+(one)\\b")
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceOffsetMap = ImmutableMap.<String, String>builder()
+        .put("last", "0")
+        .put("next one", "1")
+        .put("previous one", "-1")
+        .put("the second to last", "-1")
+        .put("the one before the last one", "-1")
+        .put("next to last", "-1")
+        .put("penultimate", "-1")
+        .put("the last but one", "-1")
+        .put("antepenultimate", "-2")
+        .put("next", "1")
+        .put("previous", "-1")
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceRelativeToMap = ImmutableMap.<String, String>builder()
+        .put("last", "end")
+        .put("next one", "current")
+        .put("previous one", "current")
+        .put("the second to last", "end")
+        .put("the one before the last one", "end")
+        .put("next to last", "end")
+        .put("penultimate", "end")
+        .put("the last but one", "end")
+        .put("antepenultimate", "end")
+        .put("next", "current")
+        .put("previous", "current")
         .build();
 }

@@ -7,21 +7,21 @@ using DateObject = System.DateTime;
 
 namespace Microsoft.Recognizers.Text.DateTime
 {
-    public class TimexUtility
+    public static class TimexUtility
     {
         private static readonly Calendar Cal = DateTimeFormatInfo.InvariantInfo.Calendar;
 
         private static readonly HashSet<char> NumberComponents = new HashSet<char>()
         {
-            '0','1','2','3','4','5','6','7','8','9','.'
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.',
         };
 
         private static readonly Dictionary<DatePeriodTimexType, string> DatePeriodTimexTypeToTimexSuffix = new Dictionary<DatePeriodTimexType, string>()
         {
-            {DatePeriodTimexType.ByDay, Constants.TimexDay },
-            {DatePeriodTimexType.ByWeek, Constants.TimexWeek },
-            {DatePeriodTimexType.ByMonth, Constants.TimexMonth },
-            {DatePeriodTimexType.ByYear, Constants.TimexYear }
+            { DatePeriodTimexType.ByDay, Constants.TimexDay },
+            { DatePeriodTimexType.ByWeek, Constants.TimexWeek },
+            { DatePeriodTimexType.ByMonth, Constants.TimexMonth },
+            { DatePeriodTimexType.ByYear, Constants.TimexYear },
         };
 
         public static string GenerateCompoundDurationTimex(Dictionary<string, string> unitToTimexComponents, IImmutableDictionary<string, long> unitValueMap)
@@ -35,7 +35,7 @@ namespace Microsoft.Recognizers.Text.DateTime
             {
                 var timexComponent = unitToTimexComponents[unitList[i]];
 
-                // The Time Duration component occurs first time, 
+                // The Time Duration component occurs first time,
                 if (!isTimeDurationAlreadyExist && IsTimeDurationTimex(timexComponent))
                 {
                     timexBuilder.Append($"{Constants.TimeTimexPrefix}{GetDurationTimexWithoutPrefix(timexComponent)}");
@@ -50,20 +50,9 @@ namespace Microsoft.Recognizers.Text.DateTime
             return timexBuilder.ToString();
         }
 
-        private static bool IsTimeDurationTimex(string timex)
-        {
-            return timex.StartsWith($"{Constants.GeneralPeriodPrefix}{Constants.TimeTimexPrefix}");
-        }
-
-        private static string GetDurationTimexWithoutPrefix(string timex)
-        {
-            // Remove "PT" prefix for TimeDuration, Remove "P" prefix for DateDuration
-            return timex.Substring(IsTimeDurationTimex(timex) ? 2 : 1);
-        }
-
         public static string GenerateDatePeriodTimex(DateObject begin, DateObject end, DatePeriodTimexType timexType, DateObject alternativeBegin = default(DateObject), DateObject alternativeEnd = default(DateObject))
         {
-            var equalDurationLength = ((end - begin) == (alternativeEnd - alternativeBegin));
+            var equalDurationLength = (end - begin) == (alternativeEnd - alternativeBegin);
 
             if (alternativeBegin.IsDefaultValue() || alternativeEnd.IsDefaultValue())
             {
@@ -83,10 +72,10 @@ namespace Microsoft.Recognizers.Text.DateTime
                         unitCount = ((end - begin).TotalDays / 7).ToString(CultureInfo.InvariantCulture);
                         break;
                     case DatePeriodTimexType.ByMonth:
-                        unitCount = (((end.Year - begin.Year) * 12) + (end.Month - begin.Month)).ToString();
+                        unitCount = (((end.Year - begin.Year) * 12) + (end.Month - begin.Month)).ToString(CultureInfo.InvariantCulture);
                         break;
                     default:
-                        unitCount = ((end.Year - begin.Year) + (end.Month - begin.Month) / 12.0).ToString(CultureInfo.InvariantCulture);
+                        unitCount = ((end.Year - begin.Year) + ((end.Month - begin.Month) / 12.0)).ToString(CultureInfo.InvariantCulture);
                         break;
                 }
             }
@@ -141,19 +130,24 @@ namespace Microsoft.Recognizers.Text.DateTime
         {
             if (!Constants.TimexBusinessDay.Equals(unitStr))
             {
-                if (Constants.DECADE_UNIT.Equals(unitStr))
+                switch (unitStr)
                 {
-                    number = number * 10;
-                    unitStr = Constants.TimexYear;
-                }
-                else
-                {
-                    unitStr = unitStr.Substring(0, 1);
+                    case Constants.DECADE_UNIT:
+                        number = number * 10;
+                        unitStr = Constants.TimexYear;
+                        break;
+                    case Constants.FORTNIGHT_UNIT:
+                        number = number * 2;
+                        unitStr = Constants.TimexWeek;
+                        break;
+                    default:
+                        unitStr = unitStr.Substring(0, 1);
+                        break;
                 }
             }
 
-            return Constants.GeneralPeriodPrefix + 
-                   (isLessThanDay ? Constants.TimeTimexPrefix : string.Empty) + 
+            return Constants.GeneralPeriodPrefix +
+                   (isLessThanDay ? Constants.TimeTimexPrefix : string.Empty) +
                    number.ToString(CultureInfo.InvariantCulture) + unitStr;
         }
 
@@ -249,10 +243,10 @@ namespace Microsoft.Recognizers.Text.DateTime
                     result.EndHour = 23;
                     result.EndMin = 59;
                     break;
-               default:
+                default:
                     break;
             }
-         
+
             return result;
         }
 
@@ -289,10 +283,10 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         public static RangeTimexComponents GetRangeTimexComponents(string rangeTimex)
         {
-            rangeTimex = rangeTimex.Replace("(", "").Replace(")", "");
+            rangeTimex = rangeTimex.Replace("(", string.Empty).Replace(")", string.Empty);
             var components = rangeTimex.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             var result = new RangeTimexComponents();
-            
+
             if (components.Length == 3)
             {
                 result.BeginTimex = components[0];
@@ -313,16 +307,16 @@ namespace Microsoft.Recognizers.Text.DateTime
         {
             return timex.Replace(Constants.TimexFuzzyYear, context.Year.ToString("D4"));
         }
-    }
 
-    public class RangeTimexComponents
-    {
-        public string BeginTimex;
+        private static bool IsTimeDurationTimex(string timex)
+        {
+            return timex.StartsWith($"{Constants.GeneralPeriodPrefix}{Constants.TimeTimexPrefix}");
+        }
 
-        public string EndTimex;
-
-        public string DurationTimex;
-
-        public bool IsValid = false;
+        private static string GetDurationTimexWithoutPrefix(string timex)
+        {
+            // Remove "PT" prefix for TimeDuration, Remove "P" prefix for DateDuration
+            return timex.Substring(IsTimeDurationTimex(timex) ? 2 : 1);
+        }
     }
 }

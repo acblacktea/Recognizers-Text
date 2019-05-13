@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using Microsoft.Recognizers.Definitions.Portuguese;
-using Microsoft.Recognizers.Text.Number;
+using Microsoft.Recognizers.Text.DateTime.Utilities;
 
 namespace Microsoft.Recognizers.Text.DateTime.Portuguese
 {
@@ -13,8 +13,8 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
         public static readonly Regex NextPrefixRegex =
             new Regex(DateTimeDefinitions.NextPrefixRegex, RegexOptions.Singleline);
 
-        public static readonly Regex PastPrefixRegex =
-            new Regex(DateTimeDefinitions.PastPrefixRegex, RegexOptions.Singleline);
+        public static readonly Regex PreviousPrefixRegex =
+            new Regex(DateTimeDefinitions.PreviousPrefixRegex, RegexOptions.Singleline);
 
         public static readonly Regex ThisPrefixRegex =
             new Regex(DateTimeDefinitions.ThisPrefixRegex, RegexOptions.Singleline);
@@ -74,6 +74,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
             LessThanRegex = PortugueseDatePeriodExtractorConfiguration.LessThanRegex;
             MoreThanRegex = PortugueseDatePeriodExtractorConfiguration.MoreThanRegex;
             CenturySuffixRegex = PortugueseDatePeriodExtractorConfiguration.CenturySuffixRegex;
+            NowRegex = PortugueseDatePeriodExtractorConfiguration.NowRegex;
             UnitMap = config.UnitMap;
             CardinalMap = config.CardinalMap;
             DayOfMonth = config.DayOfMonth;
@@ -180,9 +181,11 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
 
         public Regex CenturySuffixRegex { get; }
 
+        public Regex NowRegex { get; }
+
         Regex IDatePeriodParserConfiguration.NextPrefixRegex => NextPrefixRegex;
 
-        Regex IDatePeriodParserConfiguration.PastPrefixRegex => PastPrefixRegex;
+        Regex IDatePeriodParserConfiguration.PreviousPrefixRegex => PreviousPrefixRegex;
 
         Regex IDatePeriodParserConfiguration.ThisPrefixRegex => ThisPrefixRegex;
 
@@ -216,7 +219,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
                 swift = 1;
             }
 
-            if (PastPrefixRegex.IsMatch(trimmedText))
+            if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }
@@ -233,7 +236,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
                 swift = 1;
             }
 
-            if (PastPrefixRegex.IsMatch(trimmedText))
+            if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }
@@ -254,18 +257,18 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
         public bool IsLastCardinal(string text)
         {
             var trimmedText = text.Trim().ToLowerInvariant();
-            return PastPrefixRegex.IsMatch(trimmedText);
+            return PreviousPrefixRegex.IsMatch(trimmedText);
         }
 
         public bool IsMonthOnly(string text)
         {
-            var trimmedText = text.Trim().ToLowerInvariant().Normalized();
+            var trimmedText = text.Trim().ToLowerInvariant().Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
             return DateTimeDefinitions.MonthTerms.Any(o => trimmedText.EndsWith(o));
         }
 
         public bool IsMonthToDate(string text)
         {
-            var trimmedText = text.Trim().ToLowerInvariant().Normalized();
+            var trimmedText = text.Trim().ToLowerInvariant().Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
             return DateTimeDefinitions.MonthToDateTerms.Any(o => trimmedText.Equals(o));
         }
 
@@ -290,7 +293,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Portuguese
 
         public bool IsYearToDate(string text)
         {
-            var trimmedText = text.Trim().ToLowerInvariant().Normalized();
+            var trimmedText = text.Trim().ToLowerInvariant().Normalized(DateTimeDefinitions.SpecialCharactersEquivalent);
             return DateTimeDefinitions.YearToDateTerms.Any(o => trimmedText.Equals(o));
         }
     }

@@ -3,7 +3,7 @@ package com.microsoft.recognizers.text.datetime.english.extractors;
 import com.microsoft.recognizers.text.IExtractor;
 import com.microsoft.recognizers.text.datetime.DateTimeOptions;
 import com.microsoft.recognizers.text.datetime.config.BaseOptionsConfiguration;
-import com.microsoft.recognizers.text.datetime.english.parsers.EnglishDatetimeUtilityConfiguration;
+import com.microsoft.recognizers.text.datetime.english.utilities.EnglishDatetimeUtilityConfiguration;
 import com.microsoft.recognizers.text.datetime.extractors.BaseTimeExtractor;
 import com.microsoft.recognizers.text.datetime.extractors.BaseTimeZoneExtractor;
 import com.microsoft.recognizers.text.datetime.extractors.IDateTimeExtractor;
@@ -47,9 +47,6 @@ public class EnglishTimePeriodExtractorConfiguration extends BaseOptionsConfigur
         this(DateTimeOptions.None);
     }
 
-    //C# TO JAVA CONVERTER WARNING: The following constructor is declared outside of its associated class:
-    //ORIGINAL LINE: public EnglishTimePeriodExtractorConfiguration(DateTimeOptions options = DateTimeOptions.None)
-    //C# TO JAVA CONVERTER NOTE: Java does not support optional parameters. Overloaded method(s) are created above:
     public EnglishTimePeriodExtractorConfiguration(DateTimeOptions options) {
 
         super(options);

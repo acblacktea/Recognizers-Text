@@ -5,6 +5,8 @@ import com.microsoft.recognizers.text.datetime.Constants;
 import com.microsoft.recognizers.text.datetime.DateTimeOptions;
 import com.microsoft.recognizers.text.datetime.extractors.config.IDateTimeExtractorConfiguration;
 import com.microsoft.recognizers.text.datetime.utilities.AgoLaterUtil;
+import com.microsoft.recognizers.text.datetime.utilities.ConditionalMatch;
+import com.microsoft.recognizers.text.datetime.utilities.RegexExtension;
 import com.microsoft.recognizers.text.datetime.utilities.Token;
 import com.microsoft.recognizers.text.utilities.Match;
 import com.microsoft.recognizers.text.utilities.RegExpUtility;
@@ -151,9 +153,9 @@ public class BaseDateTimeExtractor implements IDateTimeExtractor {
             String beforeStr = input.substring(0, (er != null) ? er.getStart() : 0);
 
             // handle "this morningh at 7am"
-            Match innerMatch = Arrays.stream(RegExpUtility.getMatches(this.config.getTimeOfDayRegex(), er.getText())).findFirst().orElse(null);
-            if (innerMatch != null && innerMatch.index == 0) {
-                beforeStr = input.substring(0, ((er != null) ? er.getStart() : 0) + innerMatch.length);
+            ConditionalMatch innerMatch = RegexExtension.matchBegin(this.config.getTimeOfDayRegex(), er.getText(), true);
+            if (innerMatch.getSuccess()) {
+                beforeStr = input.substring(0, ((er != null) ? er.getStart() : 0) + innerMatch.getMatch().get().length);
             }
 
             if (StringUtility.isNullOrEmpty(beforeStr)) {
@@ -253,8 +255,16 @@ public class BaseDateTimeExtractor implements IDateTimeExtractor {
                         valid = true;
                     }
                 } else {
-                    if (this.config.isConnector(middleStr)) {
-                        valid = true;
+                    // For case like "3pm or later on monday"
+                    Optional<Match> match = Arrays.stream(RegExpUtility.getMatches(this.config.getSuffixAfterRegex(), middleStr)).findFirst();
+                    if (match.isPresent()) {
+                        middleStr = middleStr.substring(match.get().index + match.get().length).trim();
+                    }
+
+                    if (!(match.isPresent() && middleStr.isEmpty())) {
+                        if (this.config.isConnector(middleStr)) {
+                            valid = true;
+                        }
                     }
                 }
 
@@ -262,10 +272,9 @@ public class BaseDateTimeExtractor implements IDateTimeExtractor {
                     int begin = ersI.getStart();
                     int end = ersJ.getStart() + ersJ.getLength();
                     ret.add(new Token(begin, end));
+                    i = j + 1;
+                    continue;
                 }
-
-                i = j + 1;
-                continue;
             }
             i = j;
         }

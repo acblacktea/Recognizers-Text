@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
-using Microsoft.Recognizers.Text.Number;
-
 namespace Microsoft.Recognizers.Text.DateTime
 {
     public interface IDatePeriodParserConfiguration : IOptionsConfiguration
@@ -73,7 +71,7 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         Regex NextPrefixRegex { get; }
 
-        Regex PastPrefixRegex { get; }
+        Regex PreviousPrefixRegex { get; }
 
         Regex ThisPrefixRegex { get; }
 
@@ -108,6 +106,8 @@ namespace Microsoft.Recognizers.Text.DateTime
         Regex RelativeRegex { get; }
 
         Regex UnspecificEndOfRangeRegex { get; }
+
+        Regex NowRegex { get; }
 
         IImmutableDictionary<string, string> UnitMap { get; }
 

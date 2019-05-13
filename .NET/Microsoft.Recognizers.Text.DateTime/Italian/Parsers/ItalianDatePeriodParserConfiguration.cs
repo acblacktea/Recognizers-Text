@@ -72,6 +72,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
             LessThanRegex = ItalianDatePeriodExtractorConfiguration.LessThanRegex;
             MoreThanRegex = ItalianDatePeriodExtractorConfiguration.MoreThanRegex;
             CenturySuffixRegex = ItalianDatePeriodExtractorConfiguration.CenturySuffixRegex;
+            NowRegex = ItalianDatePeriodExtractorConfiguration.NowRegex;
             UnitMap = config.UnitMap;
             CardinalMap = config.CardinalMap;
             DayOfMonth = config.DayOfMonth;
@@ -177,9 +178,11 @@ namespace Microsoft.Recognizers.Text.DateTime.Italian
 
         public Regex CenturySuffixRegex { get; }
 
+        public Regex NowRegex { get; }
+
         Regex IDatePeriodParserConfiguration.NextPrefixRegex => NextPrefixRegex;
 
-        Regex IDatePeriodParserConfiguration.PastPrefixRegex => PastPrefixRegex;
+        Regex IDatePeriodParserConfiguration.PreviousPrefixRegex => PastPrefixRegex;
 
         Regex IDatePeriodParserConfiguration.ThisPrefixRegex => ThisPrefixRegex;
 

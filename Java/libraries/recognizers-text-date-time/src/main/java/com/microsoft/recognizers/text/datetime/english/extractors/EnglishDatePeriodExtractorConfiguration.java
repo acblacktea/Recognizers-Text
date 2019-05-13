@@ -12,6 +12,7 @@ import com.microsoft.recognizers.text.datetime.extractors.config.IDatePeriodExtr
 import com.microsoft.recognizers.text.datetime.extractors.config.ResultIndex;
 import com.microsoft.recognizers.text.datetime.resources.BaseDateTime;
 import com.microsoft.recognizers.text.datetime.resources.EnglishDateTime;
+import com.microsoft.recognizers.text.datetime.utilities.RegexExtension;
 import com.microsoft.recognizers.text.number.english.extractors.CardinalExtractor;
 import com.microsoft.recognizers.text.number.english.extractors.OrdinalExtractor;
 import com.microsoft.recognizers.text.number.english.parsers.EnglishNumberParserConfiguration;
@@ -32,7 +33,7 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
     public static final Pattern TimeUnitRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.TimeUnitRegex);
     public static final Pattern FollowedDateUnit = RegExpUtility.getSafeRegExp(EnglishDateTime.FollowedDateUnit);
     public static final Pattern NumberCombinedWithDateUnit = RegExpUtility.getSafeRegExp(EnglishDateTime.NumberCombinedWithDateUnit);
-    public static final Pattern PastPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PastPrefixRegex);
+    public static final Pattern PreviousPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PreviousPrefixRegex);
     public static final Pattern NextPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.NextPrefixRegex);
     public static final Pattern FutureSuffixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.FutureSuffixRegex);
     public static final Pattern WeekOfRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.WeekOfRegex);
@@ -50,6 +51,7 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
     public static final Pattern MoreThanRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.MoreThanRegex);
     public static final Pattern CenturySuffixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.CenturySuffixRegex);
     public static final Pattern IllegalYearRegex = RegExpUtility.getSafeRegExp(BaseDateTime.IllegalYearRegex);
+    public static final Pattern NowRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.NowRegex);
 
     // composite regexes
     public static final Pattern SimpleCasesRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.SimpleCasesRegex);
@@ -99,14 +101,14 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
         }
     };
 
-    private final Pattern rangeConnectorRegex;
+    public static final Pattern rangeConnectorRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.RangeConnectorRegex);
+    private final String[] durationDateRestrictions = EnglishDateTime.DurationDateRestrictions.toArray(new String[0]);
 
     private final IDateTimeExtractor datePointExtractor;
     private final IExtractor cardinalExtractor;
     private final IExtractor ordinalExtractor;
     private final IDateTimeExtractor durationExtractor;
     private final IParser numberParser;
-    private final String[] durationDateRestrictions;
 
     public EnglishDatePeriodExtractorConfiguration(IOptionsConfiguration config) {
         super(config.getOptions());
@@ -116,9 +118,6 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
         ordinalExtractor = OrdinalExtractor.getInstance();
         durationExtractor = new BaseDurationExtractor(new EnglishDurationExtractorConfiguration());
         numberParser = new BaseNumberParser(new EnglishNumberParserConfiguration());
-
-        durationDateRestrictions = EnglishDateTime.DurationDateRestrictions.toArray(new String[0]);
-        rangeConnectorRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.RangeConnectorRegex);
     }
 
     @Override
@@ -163,7 +162,7 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
 
     @Override
     public Pattern getPastRegex() {
-        return PastPrefixRegex;
+        return PreviousPrefixRegex;
     }
 
     @Override
@@ -247,6 +246,11 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
     }
 
     @Override
+    public Pattern getNowRegex() {
+        return NowRegex;
+    }
+
+    @Override
     public IDateTimeExtractor getDatePointExtractor() {
         return datePointExtractor;
     }
@@ -302,7 +306,6 @@ public class EnglishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
 
     @Override
     public boolean hasConnectorToken(String text) {
-        Optional<Match> match = Arrays.stream(RegExpUtility.getMatches(rangeConnectorRegex, text)).findFirst();
-        return match.isPresent() && match.get().length == text.trim().length();
+        return RegexExtension.isExactMatch(rangeConnectorRegex, text, true);
     }
 }

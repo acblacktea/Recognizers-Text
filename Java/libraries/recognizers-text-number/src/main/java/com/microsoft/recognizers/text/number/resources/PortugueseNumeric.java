@@ -511,4 +511,12 @@ public class PortugueseNumeric {
         .put("b", 1000000000L)
         .put("t", 1000000000000L)
         .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceOffsetMap = ImmutableMap.<String, String>builder()
+        .put("", "")
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceRelativeToMap = ImmutableMap.<String, String>builder()
+        .put("", "")
+        .build();
 }

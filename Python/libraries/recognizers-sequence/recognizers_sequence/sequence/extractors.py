@@ -10,6 +10,7 @@ from recognizers_text.utilities import RegExpUtility
 from recognizers_text.extractor import Extractor, ExtractResult
 from recognizers_number.culture import CultureInfo
 from recognizers_sequence.resources import BasePhoneNumbers
+from recognizers_sequence.resources import BaseEmail
 
 ReVal = namedtuple('ReVal', ['re', 'val'])
 MatchesVal = namedtuple('MatchesVal', ['matches', 'val'])
@@ -97,6 +98,14 @@ class BasePhoneNumberExtractor(SequenceExtractor):
                 ch_gap = source[er.start - 2]
                 if not ch_gap.isdigit():
                     ret.append(er)
+                front = source[0:er.start - 1]
+                international_dialing_prefix_regex = re.compile(BasePhoneNumbers.InternationDialingPrefixRegex)
+                match = international_dialing_prefix_regex.search(front)
+                if match is not None:
+                    er.start = match.start()
+                    er.length = er.length + match.end() - match.start() + 1
+                    er.text = source[er.start:er.start + er.length].strip()
+                    ret.append(er)
         return ret
 
     def __init__(self):
@@ -113,4 +122,20 @@ class BasePhoneNumberExtractor(SequenceExtractor):
             ReVal(RegExpUtility.get_safe_reg_exp(BasePhoneNumbers.NLPhoneNumberRegex), Constants.PHONE_NUMBER_REGEX_NL),
             ReVal(RegExpUtility.get_safe_reg_exp(BasePhoneNumbers.SpecialPhoneNumberRegex),
                   Constants.PHONE_NUMBER_REGEX_SPECIAL),
+        ]
+
+class BaseEmailExtractor(SequenceExtractor):
+    @property
+    def _extract_type(self) -> str:
+        return 'email'
+
+    @property
+    def regexes(self) -> List[ReVal]:
+        return self._regexes
+
+    def __init__(self):
+        self._regexes = [
+            ReVal(RegExpUtility.get_safe_reg_exp(BaseEmail.EmailRegex), Constants.EMAIL_REGEX),
+            #EmailRegex2 will break the code as it's not supported in Python, comment out for now
+            #ReVal(RegExpUtility.get_safe_reg_exp(BaseEmail.EmailRegex2), Constants.EMAIL_REGEX),
         ]

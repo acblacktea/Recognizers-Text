@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
-
 using Microsoft.Recognizers.Definitions.Korean;
 
 namespace Microsoft.Recognizers.Text.Number.Korean
 {
-    public class KoreanNumberParserConfiguration : INumberParserConfiguration, ICJKNumberParserConfiguration
+    public class KoreanNumberParserConfiguration : BaseNumberParserConfiguration, ICJKNumberParserConfiguration
     {
-
-        public KoreanNumberParserConfiguration() : this(new CultureInfo(Culture.Korean))
+        public KoreanNumberParserConfiguration()
+            : this(new CultureInfo(Culture.Korean))
         {
-
         }
 
         public KoreanNumberParserConfiguration(CultureInfo ci)
@@ -34,6 +32,8 @@ namespace Microsoft.Recognizers.Text.Number.Korean
 
             CardinalNumberMap = new Dictionary<string, long>().ToImmutableDictionary();
             OrdinalNumberMap = new Dictionary<string, long>().ToImmutableDictionary();
+            RelativeReferenceOffsetMap = NumbersDefinitions.RelativeReferenceOffsetMap.ToImmutableDictionary();
+            RelativeReferenceRelativeToMap = NumbersDefinitions.RelativeReferenceRelativeToMap.ToImmutableDictionary();
             RoundNumberMap = NumbersDefinitions.RoundNumberMap.ToImmutableDictionary();
             ZeroToNineMap = NumbersDefinitions.ZeroToNineMap.ToImmutableDictionary();
             RoundNumberMapChar = NumbersDefinitions.RoundNumberMapChar.ToImmutableDictionary();
@@ -58,26 +58,6 @@ namespace Microsoft.Recognizers.Text.Number.Korean
             FractionPrepositionRegex = null;
         }
 
-        public NumberOptions Options { get; }
-
-        public CultureInfo CultureInfo { get; private set; }
-
-        public char DecimalSeparatorChar { get; private set; }
-
-        public Regex DigitalNumberRegex { get; private set; }
-
-        public Regex FractionPrepositionRegex { get; }
-
-        public string FractionMarkerToken { get; private set; }
-
-        public Regex HalfADozenRegex { get; private set; }
-
-        public string HalfADozenText { get; private set; }
-
-        public string LangMarker { get; private set; }
-
-        public char NonDecimalSeparatorChar { get; private set; }
-
         public string NonDecimalSeparatorText { get; private set; }
 
         public Regex DigitNumRegex { get; private set; }
@@ -92,8 +72,6 @@ namespace Microsoft.Recognizers.Text.Number.Korean
 
         public Regex NegativeNumberTermsRegex { get; private set; }
 
-        public Regex NegativeNumberSignRegex { get; private set; }
-
         public Regex PointRegex { get; private set; }
 
         public Regex SpeGetNumberRegex { get; private set; }
@@ -101,12 +79,6 @@ namespace Microsoft.Recognizers.Text.Number.Korean
         public Regex PairRegex { get; private set; }
 
         public Regex RoundNumberIntegerRegex { get; private set; }
-
-        public ImmutableDictionary<string, long> OrdinalNumberMap { get; private set; }
-
-        public ImmutableDictionary<string, long> CardinalNumberMap { get; private set; }
-
-        public ImmutableDictionary<string, long> RoundNumberMap { get; private set; }
 
         public ImmutableDictionary<char, double> ZeroToNineMap { get; private set; }
 
@@ -120,22 +92,12 @@ namespace Microsoft.Recognizers.Text.Number.Korean
 
         public ImmutableList<char> RoundDirectList { get; private set; }
 
-        public string WordSeparatorToken { get; private set; }
-
-        public IEnumerable<string> WrittenDecimalSeparatorTexts { get; private set; }
-
-        public IEnumerable<string> WrittenGroupSeparatorTexts { get; private set; }
-
-        public IEnumerable<string> WrittenIntegerSeparatorTexts { get; private set; }
-
-        public IEnumerable<string> WrittenFractionSeparatorTexts { get; private set; }
-
-        public IEnumerable<string> NormalizeTokenSet(IEnumerable<string> tokens, ParseResult context)
+        public override IEnumerable<string> NormalizeTokenSet(IEnumerable<string> tokens, ParseResult context)
         {
             return tokens;
         }
 
-        public long ResolveCompositeNumber(string numberStr)
+        public override long ResolveCompositeNumber(string numberStr)
         {
             return 0;
         }

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using Microsoft.Recognizers.Definitions.German;
-using Microsoft.Recognizers.Text.Number;
 
 namespace Microsoft.Recognizers.Text.DateTime.German
 {
@@ -12,8 +11,8 @@ namespace Microsoft.Recognizers.Text.DateTime.German
         public static readonly Regex NextPrefixRegex =
             new Regex(DateTimeDefinitions.NextPrefixRegex, RegexOptions.Singleline);
 
-        public static readonly Regex PastPrefixRegex =
-            new Regex(DateTimeDefinitions.PastPrefixRegex, RegexOptions.Singleline);
+        public static readonly Regex PreviousPrefixRegex =
+            new Regex(DateTimeDefinitions.PreviousPrefixRegex, RegexOptions.Singleline);
 
         public static readonly Regex ThisPrefixRegex =
             new Regex(DateTimeDefinitions.ThisPrefixRegex, RegexOptions.Singleline);
@@ -44,7 +43,7 @@ namespace Microsoft.Recognizers.Text.DateTime.German
             MonthWithYear = GermanDatePeriodExtractorConfiguration.MonthWithYear;
             MonthNumWithYear = GermanDatePeriodExtractorConfiguration.MonthNumWithYear;
             YearRegex = GermanDatePeriodExtractorConfiguration.YearRegex;
-            PastRegex = GermanDatePeriodExtractorConfiguration.PastPrefixRegex;
+            PastRegex = GermanDatePeriodExtractorConfiguration.PreviousPrefixRegex;
             FutureRegex = GermanDatePeriodExtractorConfiguration.NextPrefixRegex;
             FutureSuffixRegex = GermanDatePeriodExtractorConfiguration.FutureSuffixRegex;
             NumberCombinedWithUnit = GermanDurationExtractorConfiguration.NumberCombinedWithDurationUnit;
@@ -73,6 +72,7 @@ namespace Microsoft.Recognizers.Text.DateTime.German
             LessThanRegex = GermanDatePeriodExtractorConfiguration.LessThanRegex;
             MoreThanRegex = GermanDatePeriodExtractorConfiguration.MoreThanRegex;
             CenturySuffixRegex = GermanDatePeriodExtractorConfiguration.CenturySuffixRegex;
+            NowRegex = GermanDatePeriodExtractorConfiguration.NowRegex;
             UnitMap = config.UnitMap;
             CardinalMap = config.CardinalMap;
             DayOfMonth = config.DayOfMonth;
@@ -179,9 +179,11 @@ namespace Microsoft.Recognizers.Text.DateTime.German
 
         public Regex CenturySuffixRegex { get; }
 
+        public Regex NowRegex { get; }
+
         Regex IDatePeriodParserConfiguration.NextPrefixRegex => NextPrefixRegex;
 
-        Regex IDatePeriodParserConfiguration.PastPrefixRegex => PastPrefixRegex;
+        Regex IDatePeriodParserConfiguration.PreviousPrefixRegex => PreviousPrefixRegex;
 
         Regex IDatePeriodParserConfiguration.ThisPrefixRegex => ThisPrefixRegex;
 
@@ -215,7 +217,7 @@ namespace Microsoft.Recognizers.Text.DateTime.German
             {
                 swift = 1;
             }
-            else if (PastPrefixRegex.IsMatch(trimmedText))
+            else if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }
@@ -231,7 +233,7 @@ namespace Microsoft.Recognizers.Text.DateTime.German
             {
                 swift = 1;
             }
-            else if (PastPrefixRegex.IsMatch(trimmedText))
+            else if (PreviousPrefixRegex.IsMatch(trimmedText))
             {
                 swift = -1;
             }

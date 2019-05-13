@@ -76,6 +76,7 @@ namespace Microsoft.Recognizers.Text.DateTime.French
             LessThanRegex = FrenchDatePeriodExtractorConfiguration.LessThanRegex;
             MoreThanRegex = FrenchDatePeriodExtractorConfiguration.MoreThanRegex;
             CenturySuffixRegex = FrenchDatePeriodExtractorConfiguration.CenturySuffixRegex;
+            NowRegex = FrenchDatePeriodExtractorConfiguration.NowRegex;
 
             UnitMap = config.UnitMap;
             CardinalMap = config.CardinalMap;
@@ -182,9 +183,11 @@ namespace Microsoft.Recognizers.Text.DateTime.French
 
         public Regex CenturySuffixRegex { get; }
 
+        public Regex NowRegex { get; }
+
         Regex IDatePeriodParserConfiguration.NextPrefixRegex => NextPrefixRegex;
 
-        Regex IDatePeriodParserConfiguration.PastPrefixRegex => PastPrefixRegex;
+        Regex IDatePeriodParserConfiguration.PreviousPrefixRegex => PastPrefixRegex;
 
         Regex IDatePeriodParserConfiguration.ThisPrefixRegex => ThisPrefixRegex;
 

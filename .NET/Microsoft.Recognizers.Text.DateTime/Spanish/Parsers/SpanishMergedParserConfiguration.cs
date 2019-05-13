@@ -6,32 +6,14 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
 {
     public sealed class SpanishMergedParserConfiguration : SpanishCommonDateTimeParserConfiguration, IMergedParserConfiguration
     {
-
-        public Regex BeforeRegex { get; }
-
-        public Regex AfterRegex { get; }
-
-        public Regex SinceRegex { get; }
-
-        public Regex AroundRegex { get; }
-
-        public Regex DateAfter { get; }
-
-        public Regex YearRegex { get; }
-
-        public IDateTimeParser SetParser { get; }
-
-        public IDateTimeParser HolidayParser { get; }
-
-        public StringMatcher SuperfluousWordMatcher { get; }
-
-        public SpanishMergedParserConfiguration(IOptionsConfiguration config) : base(config)
+        public SpanishMergedParserConfiguration(IOptionsConfiguration config)
+            : base(config)
         {
             BeforeRegex = SpanishMergedExtractorConfiguration.BeforeRegex;
             AfterRegex = SpanishMergedExtractorConfiguration.AfterRegex;
             SinceRegex = SpanishMergedExtractorConfiguration.SinceRegex;
             AroundRegex = SpanishMergedExtractorConfiguration.AroundRegex;
-            DateAfter = SpanishMergedExtractorConfiguration.DateAfterRegex;
+            SuffixAfter = SpanishMergedExtractorConfiguration.SuffixAfterRegex;
             YearRegex = SpanishDatePeriodExtractorConfiguration.YearRegex;
             SuperfluousWordMatcher = SpanishMergedExtractorConfiguration.SuperfluousWordMatcher;
 
@@ -42,5 +24,23 @@ namespace Microsoft.Recognizers.Text.DateTime.Spanish
             HolidayParser = new BaseHolidayParser(new SpanishHolidayParserConfiguration(this));
             TimeZoneParser = new DummyTimeZoneParser();
         }
+
+        public Regex BeforeRegex { get; }
+
+        public Regex AfterRegex { get; }
+
+        public Regex SinceRegex { get; }
+
+        public Regex AroundRegex { get; }
+
+        public Regex SuffixAfter { get; }
+
+        public Regex YearRegex { get; }
+
+        public IDateTimeParser SetParser { get; }
+
+        public IDateTimeParser HolidayParser { get; }
+
+        public StringMatcher SuperfluousWordMatcher { get; }
     }
 }

@@ -6,31 +6,14 @@ namespace Microsoft.Recognizers.Text.DateTime.German
 {
     public sealed class GermanMergedParserConfiguration : GermanCommonDateTimeParserConfiguration, IMergedParserConfiguration
     {
-        public Regex BeforeRegex { get; }
-
-        public Regex AfterRegex { get; }
-
-        public Regex SinceRegex { get; }
-
-        public Regex AroundRegex { get; }
-
-        public Regex DateAfter { get; }
-
-        public Regex YearRegex { get; }
-
-        public IDateTimeParser SetParser { get; }
-
-        public IDateTimeParser HolidayParser { get; }
-
-        public StringMatcher SuperfluousWordMatcher { get; }
-
-        public GermanMergedParserConfiguration(IOptionsConfiguration config) : base(config)
+        public GermanMergedParserConfiguration(IOptionsConfiguration config)
+            : base(config)
         {
             BeforeRegex = GermanMergedExtractorConfiguration.BeforeRegex;
             AfterRegex = GermanMergedExtractorConfiguration.AfterRegex;
             SinceRegex = GermanMergedExtractorConfiguration.SinceRegex;
             AroundRegex = GermanMergedExtractorConfiguration.AroundRegex;
-            DateAfter = GermanMergedExtractorConfiguration.DateAfterRegex;
+            SuffixAfter = GermanMergedExtractorConfiguration.SuffixAfterRegex;
             YearRegex = GermanDatePeriodExtractorConfiguration.YearRegex;
             SuperfluousWordMatcher = GermanMergedExtractorConfiguration.SuperfluousWordMatcher;
             DatePeriodParser = new BaseDatePeriodParser(new GermanDatePeriodParserConfiguration(this));
@@ -40,5 +23,23 @@ namespace Microsoft.Recognizers.Text.DateTime.German
             HolidayParser = new HolidayParserGer(new GermanHolidayParserConfiguration(this));
             TimeZoneParser = new DummyTimeZoneParser();
         }
+
+        public Regex BeforeRegex { get; }
+
+        public Regex AfterRegex { get; }
+
+        public Regex SinceRegex { get; }
+
+        public Regex AroundRegex { get; }
+
+        public Regex SuffixAfter { get; }
+
+        public Regex YearRegex { get; }
+
+        public IDateTimeParser SetParser { get; }
+
+        public IDateTimeParser HolidayParser { get; }
+
+        public StringMatcher SuperfluousWordMatcher { get; }
     }
 }

@@ -9,11 +9,19 @@ namespace Microsoft.Recognizers.Text.Number
 {
     public abstract class BaseNumberExtractor : IExtractor
     {
+        public static readonly Regex CurrencyRegex =
+            new Regex(BaseNumbers.CurrencyRegex, RegexOptions.Singleline);
+
+        public BaseNumberExtractor(NumberOptions options = NumberOptions.None)
+        {
+            Options = options;
+        }
+
         internal abstract ImmutableDictionary<Regex, TypeTag> Regexes { get; }
 
         protected virtual ImmutableDictionary<Regex, Regex> AmbiguityFiltersDict { get; } = null;
 
-        protected virtual string ExtractType { get; } = "";
+        protected virtual string ExtractType { get; } = string.Empty;
 
         protected virtual NumberOptions Options { get; } = NumberOptions.None;
 
@@ -21,8 +29,9 @@ namespace Microsoft.Recognizers.Text.Number
 
         protected virtual Regex AmbiguousFractionConnectorsRegex { get; } = null;
 
-        public static readonly Regex CurrencyRegex = 
-            new Regex(BaseNumbers.CurrencyRegex, RegexOptions.Singleline);
+        protected virtual Regex RelativeReferenceRegex { get; } = null;
+
+        protected virtual Regex RelativeOrdinalFilterRegex { get; } = null;
 
         public virtual List<ExtractResult> Extract(string source)
         {
@@ -40,8 +49,14 @@ namespace Microsoft.Recognizers.Text.Number
             {
                 foreach (Match m in collection.Key)
                 {
-                    // In ExperimentalMode, AmbigiuousFraction like "30000 in 2009" needs to be skipped
+                    // In ExperimentalMode, AmbiguousFraction like "30000 in 2009" needs to be skipped
                     if ((Options & NumberOptions.ExperimentalMode) != 0 && AmbiguousFractionConnectorsRegex.Match(m.Value).Success)
+                    {
+                        continue;
+                    }
+
+                    // In EnablePreview, cases like "last", "next" should not be skipped
+                    if ((Options & NumberOptions.EnablePreview) == 0 && IsRelativeOrdinal(m.Value))
                     {
                         continue;
                     }
@@ -49,6 +64,13 @@ namespace Microsoft.Recognizers.Text.Number
                     for (var j = 0; j < m.Length; j++)
                     {
                         matched[m.Index + j] = true;
+                    }
+
+                    // Fliter out cases like "first two", "last one"
+                    // only support in English now
+                    if (ExtractType.Contains(Constants.MODEL_ORDINAL) && RelativeOrdinalFilterRegex != null && RelativeOrdinalFilterRegex.IsMatch(source))
+                    {
+                        continue;
                     }
 
                     // Keep Source Data for extra information
@@ -90,8 +112,18 @@ namespace Microsoft.Recognizers.Text.Number
                                 Length = length,
                                 Text = substr,
                                 Type = ExtractType,
-                                Data = type
+                                Data = type,
                             };
+
+                            // Add Metadata information for Ordinal
+                            if (ExtractType.Contains(Constants.MODEL_ORDINAL))
+                            {
+                                er.Metadata = new Metadata();
+                                if (IsRelativeOrdinal(substr))
+                                {
+                                    er.Metadata.IsOrdinalRelative = true;
+                                }
+                            }
 
                             result.Add(er);
                         }
@@ -108,9 +140,30 @@ namespace Microsoft.Recognizers.Text.Number
             return result;
         }
 
+        protected static Regex GenerateLongFormatNumberRegexes(LongFormatType type, string placeholder = BaseNumbers.PlaceHolderDefault)
+        {
+            var thousandsMark = Regex.Escape(type.ThousandsMark.ToString());
+            var decimalsMark = Regex.Escape(type.DecimalsMark.ToString());
+
+            var regexDefinition = type.DecimalsMark.Equals('\0') ?
+                BaseNumbers.IntegerRegexDefinition(placeholder, thousandsMark) :
+                BaseNumbers.DoubleRegexDefinition(placeholder, thousandsMark, decimalsMark);
+
+            return new Regex(regexDefinition, RegexOptions.Singleline);
+        }
+
+        private bool IsRelativeOrdinal(string matchValue)
+        {
+            if (RelativeReferenceRegex == null)
+            {
+                return false;
+            }
+
+            return RelativeReferenceRegex.Match(matchValue).Success;
+        }
+
         private List<ExtractResult> FilterAmbiguity(List<ExtractResult> ers, string text)
         {
-
             if (AmbiguityFiltersDict != null)
             {
                 foreach (var regex in AmbiguityFiltersDict)
@@ -125,81 +178,5 @@ namespace Microsoft.Recognizers.Text.Number
 
             return ers;
         }
-
-        protected Regex GenerateLongFormatNumberRegexes(LongFormatType type, string placeholder = BaseNumbers.PlaceHolderDefault)
-        {
-            var thousandsMark = Regex.Escape(type.ThousandsMark.ToString());
-            var decimalsMark = Regex.Escape(type.DecimalsMark.ToString());
-
-            var regexDefinition = type.DecimalsMark.Equals('\0') ?
-                BaseNumbers.IntegerRegexDefinition(placeholder, thousandsMark) :
-                BaseNumbers.DoubleRegexDefinition(placeholder, thousandsMark, decimalsMark);
-
-            return new Regex(regexDefinition, RegexOptions.Singleline);
-        }
-    }
-
-    public enum NumberMode
-    {
-        //Default is for unit and datetime
-        Default,
-        //Add 67.5 billion & million support.
-        Currency,
-        //Don't extract number from cases like 16ml
-        PureNumber
-    }
-
-    public class LongFormatType
-    {
-        // Reference Value : 1234567.89
-
-        // 1,234,567
-        public static LongFormatType IntegerNumComma = new LongFormatType(',', '\0');
-
-        // 1.234.567
-        public static LongFormatType IntegerNumDot = new LongFormatType('.', '\0');
-
-        // 1 234 567
-        public static LongFormatType IntegerNumBlank = new LongFormatType(' ', '\0');
-
-        // 1 234 567
-        public static LongFormatType IntegerNumNoBreakSpace = new LongFormatType(Constants.NO_BREAK_SPACE, '\0');
-
-        // 1'234'567
-        public static LongFormatType IntegerNumQuote = new LongFormatType('\'', '\0');
-
-        // 1,234,567.89
-        public static LongFormatType DoubleNumCommaDot = new LongFormatType(',', '.');
-
-        // 1,234,567·89
-        public static LongFormatType DoubleNumCommaCdot = new LongFormatType(',', '·');
-
-        // 1 234 567,89
-        public static LongFormatType DoubleNumBlankComma = new LongFormatType(' ', ',');
-
-        // 1 234 567,89
-        public static LongFormatType DoubleNumNoBreakSpaceComma = new LongFormatType(Constants.NO_BREAK_SPACE, ',');
-
-        // 1 234 567.89
-        public static LongFormatType DoubleNumBlankDot = new LongFormatType(' ', '.');
-
-        // 1 234 567.89
-        public static LongFormatType DoubleNumNoBreakSpaceDot = new LongFormatType(Constants.NO_BREAK_SPACE, '.');
-
-        // 1.234.567,89
-        public static LongFormatType DoubleNumDotComma = new LongFormatType('.', ',');
-
-        // 1'234'567,89
-        public static LongFormatType DoubleNumQuoteComma = new LongFormatType('\'', ',');
-
-        private LongFormatType(char thousandsMark, char decimalsMark)
-        {
-            ThousandsMark = thousandsMark;
-            DecimalsMark = decimalsMark;
-        }
-
-        public char DecimalsMark { get; }
-
-        public char ThousandsMark { get; }
     }
 }

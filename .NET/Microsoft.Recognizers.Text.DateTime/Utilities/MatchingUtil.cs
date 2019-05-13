@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,7 +7,7 @@ using Microsoft.Recognizers.Text.Matcher;
 
 namespace Microsoft.Recognizers.Text.DateTime
 {
-    public class MatchingUtil
+    public static class MatchingUtil
     {
         public static bool GetAgoLaterIndex(string text, Regex regex, out int index)
         {
@@ -38,21 +38,17 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         public static bool ContainsAgoLaterIndex(string text, Regex regex)
         {
-            int index = -1;
-            return GetAgoLaterIndex(text, regex, out index);
+            return GetAgoLaterIndex(text, regex, out var index);
         }
 
         public static bool ContainsTermIndex(string text, Regex regex)
         {
-            int index = -1;
-            return GetTermIndex(text, regex, out index);
+            return GetTermIndex(text, regex, out var index);
         }
 
         // Temporary solution for remove superfluous words only under the Preview mode
-        public static string PreProcessTextRemoveSuperfluousWords(string text, StringMatcher matcher, 
-                                                                  out List<MatchResult<string>> superfluousWordMatches)
+        public static string PreProcessTextRemoveSuperfluousWords(string text, StringMatcher matcher, out List<MatchResult<string>> superfluousWordMatches)
         {
-
             superfluousWordMatches = RemoveSubMatches(matcher.Find(text));
 
             var bias = 0;
@@ -67,11 +63,8 @@ namespace Microsoft.Recognizers.Text.DateTime
         }
 
         // Temporary solution for recover superfluous words only under the Preview mode
-        public static List<ExtractResult> PosProcessExtractionRecoverSuperfluousWords(List<ExtractResult> extractResults,
-                                                                                      List<MatchResult<string>> superfluousWordMatches, 
-                                                                                      string originText)
+        public static List<ExtractResult> PostProcessRecoverSuperfluousWords(List<ExtractResult> extractResults, List<MatchResult<string>> superfluousWordMatches, string originText)
         {
-
             foreach (var match in superfluousWordMatches)
             {
                 foreach (var extractResult in extractResults)
@@ -104,9 +97,7 @@ namespace Microsoft.Recognizers.Text.DateTime
             return matchList.Where(item =>
                 !matchList.Any(
                     ritem => (ritem.Start < item.Start && ritem.End >= item.End) ||
-                             (ritem.Start <= item.Start && ritem.End > item.End)
-                    )
-                ).ToList();
+                             (ritem.Start <= item.Start && ritem.End > item.End))).ToList();
         }
     }
 }

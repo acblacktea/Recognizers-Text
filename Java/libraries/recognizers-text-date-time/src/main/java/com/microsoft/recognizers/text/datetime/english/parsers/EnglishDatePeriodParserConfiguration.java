@@ -46,7 +46,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
         monthWithYear = EnglishDatePeriodExtractorConfiguration.MonthWithYear;
         monthNumWithYear = EnglishDatePeriodExtractorConfiguration.MonthNumWithYear;
         yearRegex = EnglishDatePeriodExtractorConfiguration.YearRegex;
-        pastRegex = EnglishDatePeriodExtractorConfiguration.PastPrefixRegex;
+        pastRegex = EnglishDatePeriodExtractorConfiguration.PreviousPrefixRegex;
         futureRegex = EnglishDatePeriodExtractorConfiguration.NextPrefixRegex;
         futureSuffixRegex = EnglishDatePeriodExtractorConfiguration.FutureSuffixRegex;
         numberCombinedWithUnit = EnglishDurationExtractorConfiguration.NumberCombinedWithDurationUnit;
@@ -77,6 +77,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
         centurySuffixRegex = EnglishDatePeriodExtractorConfiguration.CenturySuffixRegex;
         relativeRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.RelativeRegex);
         unspecificEndOfRangeRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.UnspecificEndOfRangeRegex);
+        nowRegex = EnglishDatePeriodExtractorConfiguration.NowRegex;
 
         unitMap = config.getUnitMap();
         cardinalMap = config.getCardinalMap();
@@ -88,7 +89,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
         specialDecadeCases = config.getSpecialDecadeCases();
 
         nextPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.NextPrefixRegex);
-        pastPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PastPrefixRegex);
+        previousPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.PreviousPrefixRegex);
         thisPrefixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.ThisPrefixRegex);
         afterNextSuffixRegex = RegExpUtility.getSafeRegExp(EnglishDateTime.AfterNextSuffixRegex);
     }
@@ -148,9 +149,10 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
     private final Pattern relativeRegex;
     private final Pattern unspecificEndOfRangeRegex;
     private final Pattern nextPrefixRegex;
-    private final Pattern pastPrefixRegex;
+    private final Pattern previousPrefixRegex;
     private final Pattern thisPrefixRegex;
     private final Pattern afterNextSuffixRegex;
+    private final Pattern nowRegex;
 
     // Dictionaries
     private final ImmutableMap<String, String> unitMap;
@@ -329,7 +331,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
 
     @Override
     public Pattern getPastPrefixRegex() {
-        return pastPrefixRegex;
+        return previousPrefixRegex;
     }
 
     @Override
@@ -418,6 +420,11 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
     }
 
     @Override
+    public Pattern getNowRegex() {
+        return nowRegex;
+    }
+
+    @Override
     public ImmutableMap<String, String> getUnitMap() {
         return unitMap;
     }
@@ -465,7 +472,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
 
         Optional<Match> matchAfterNext = Arrays.stream(RegExpUtility.getMatches(afterNextSuffixRegex, trimmedText)).findFirst();
         Optional<Match> matchNext = Arrays.stream(RegExpUtility.getMatches(nextPrefixRegex, trimmedText)).findFirst();
-        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(pastPrefixRegex, trimmedText)).findFirst();
+        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(previousPrefixRegex, trimmedText)).findFirst();
 
         if (matchAfterNext.isPresent()) {
             swift = 2;
@@ -486,7 +493,7 @@ public class EnglishDatePeriodParserConfiguration extends BaseOptionsConfigurati
 
         Optional<Match> matchAfterNext = Arrays.stream(RegExpUtility.getMatches(afterNextSuffixRegex, trimmedText)).findFirst();
         Optional<Match> matchNext = Arrays.stream(RegExpUtility.getMatches(nextPrefixRegex, trimmedText)).findFirst();
-        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(pastPrefixRegex, trimmedText)).findFirst();
+        Optional<Match> matchPast = Arrays.stream(RegExpUtility.getMatches(previousPrefixRegex, trimmedText)).findFirst();
         Optional<Match> matchThisPresent = Arrays.stream(RegExpUtility.getMatches(thisPrefixRegex, trimmedText)).findFirst();
 
         if (matchAfterNext.isPresent()) {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.Recognizers.Text.DateTime.Utilities;
-using Microsoft.Recognizers.Text.Number;
 
 namespace Microsoft.Recognizers.Text.DateTime
 {
@@ -48,6 +47,8 @@ namespace Microsoft.Recognizers.Text.DateTime
         Regex UnitRegex { get; }
 
         Regex DateNumberConnectorRegex { get; }
+
+        Regex YearRegex { get; }
 
         IImmutableDictionary<string, string> UnitMap { get; }
 

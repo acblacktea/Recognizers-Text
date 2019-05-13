@@ -128,11 +128,11 @@ class BaseMergedExtractor(DateTimeExtractor):
         result: List[ExtractResult] = list()
         result = self.add_to(result, self.config.date_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.time_extractor.extract(source, reference), source)
-        result = self.add_to(result, self.config.duration_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.date_period_extractor.extract(source, reference), source)
-        result = self.add_to(result, self.config.date_time_extractor.extract(source, reference), source)
+        result = self.add_to(result, self.config.duration_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.time_period_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.date_time_period_extractor.extract(source, reference), source)
+        result = self.add_to(result, self.config.date_time_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.set_extractor.extract(source, reference), source)
         result = self.add_to(result, self.config.holiday_extractor.extract(source, reference), source)
 
@@ -207,6 +207,7 @@ class BaseMergedExtractor(DateTimeExtractor):
 
     def add_mod_item(self, er: ExtractResult, source: str) -> ExtractResult:
         before_str = source[0:er.start]
+        is_success = False
 
         before = self.has_token_index(before_str.strip(), self.config.before_regex)
         if before.matched:
@@ -214,20 +215,24 @@ class BaseMergedExtractor(DateTimeExtractor):
             er.length += mod_len
             er.start -= mod_len
             er.text = source[er.start:er.start + er.length]
+            is_success = True
 
-        after = self.has_token_index(before_str.strip(), self.config.after_regex)
-        if after.matched:
-            mod_len = len(before_str) - after.index
-            er.length += mod_len
-            er.start -= mod_len
-            er.text = source[er.start:er.start + er.length]
+        if not is_success:
+            after = self.has_token_index(before_str.strip(), self.config.after_regex)
+            if after.matched:
+                mod_len = len(before_str) - after.index
+                er.length += mod_len
+                er.start -= mod_len
+                er.text = source[er.start:er.start + er.length]
+                is_success = True
 
-        since = self.has_token_index(before_str.strip(), self.config.since_regex)
-        if since.matched:
-            mod_len = len(before_str) - since.index
-            er.length += mod_len
-            er.start -= mod_len
-            er.text = source[er.start:er.start + er.length]
+        if not is_success:
+            since = self.has_token_index(before_str.strip(), self.config.since_regex)
+            if not is_success and since.matched:
+                mod_len = len(before_str) - since.index
+                er.length += mod_len
+                er.start -= mod_len
+                er.text = source[er.start:er.start + er.length]
 
         return er
 
@@ -509,11 +514,11 @@ class BaseMergedParser(DateTimeParser):
                 self._add_resolution_fields_any(result, Constants.ResolveToFutureKey, future)
 
         if comment == 'ampm':
-            if 'resolve' in result:
-                self._resolve_ampm(result, 'resolve')
+            if Constants.ResolveKey in result:
+                self._resolve_ampm(result, Constants.ResolveKey)
             else:
-                self._resolve_ampm(result, 'resolveToPast')
-                self._resolve_ampm(result, 'resolveToFuture')
+                self._resolve_ampm(result, Constants.ResolveToPastKey)
+                self._resolve_ampm(result, Constants.ResolveToFutureKey)
 
         for value in result.values():
             if isinstance(value, dict):
@@ -609,10 +614,10 @@ class BaseMergedParser(DateTimeParser):
         result[TimeTypeConstants.END] = end
 
     def _resolve_ampm(self, values_map: Dict[str, str], keyname: str):
-        if not keyname in values_map:
+        if keyname not in values_map:
             return
         resolution = values_map[keyname]
-        if not 'timex' in values_map:
+        if Constants.TimexKey not in values_map:
             return
         timex = values_map['timex']
         values_map.pop(keyname, None)

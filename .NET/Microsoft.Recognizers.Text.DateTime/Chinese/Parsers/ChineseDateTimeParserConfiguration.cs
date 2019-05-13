@@ -8,17 +8,18 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
 {
     public class ChineseDateTimeParserConfiguration : BaseOptionsConfiguration, IFullDateTimeParserConfiguration
     {
-        public ChineseDateTimeParserConfiguration(DateTimeOptions options = DateTimeOptions.None) : base(options)
+        public ChineseDateTimeParserConfiguration(DateTimeOptions options = DateTimeOptions.None)
+            : base(options)
         {
-            DateParser = new DateParser(this);
-            TimeParser = new TimeParserChs(this);
-            DateTimeParser = new DateTimeParserChs(this);
-            DatePeriodParser = new DatePeriodParserChs(this);
-            TimePeriodParser = new TimePeriodParserChs(this);
-            DateTimePeriodParser = new DateTimePeriodParserChs(this);
-            DurationParser = new DurationParserChs(this);
-            GetParser = new SetParserChs(this);
-            HolidayParser = new HolidayParserChs(this);
+            DateParser = new ChineseDateParserConfiguration(this);
+            TimeParser = new ChineseTimeParserConfiguration(this);
+            DateTimeParser = new ChineseDateTimeParser(this);
+            DatePeriodParser = new ChineseDatePeriodParserConfiguration(this);
+            TimePeriodParser = new ChineseTimePeriodParserConfiguration(this);
+            DateTimePeriodParser = new ChineseDateTimePeriodParserConfiguration(this);
+            DurationParser = new ChineseDurationParserConfiguration(this);
+            GetParser = new ChineseSetParserConfiguration(this);
+            HolidayParser = new ChineseHolidayParserConfiguration(this);
             UnitMap = DateTimeDefinitions.ParserConfigurationUnitMap.ToImmutableDictionary();
             UnitValueMap = DateTimeDefinitions.ParserConfigurationUnitValueMap.ToImmutableDictionary();
             SeasonMap = DateTimeDefinitions.ParserConfigurationSeasonMap.ToImmutableDictionary();
@@ -28,17 +29,17 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
             DayOfWeek = DateTimeDefinitions.ParserConfigurationDayOfWeek.ToImmutableDictionary();
             MonthOfYear = DateTimeDefinitions.ParserConfigurationMonthOfYear.ToImmutableDictionary();
             Numbers = InitNumbers();
-            DateRegexList = DateExtractorChs.DateRegexList;
-            NextRegex = DateExtractorChs.NextRegex;
-            ThisRegex = DateExtractorChs.ThisRegex;
-            LastRegex = DateExtractorChs.LastRegex;
-            StrictWeekDayRegex = DateExtractorChs.WeekDayRegex;
-            WeekDayOfMonthRegex = DateExtractorChs.WeekDayOfMonthRegex;
-            BeforeRegex = MergedExtractorChs.BeforeRegex;
-            AfterRegex = MergedExtractorChs.AfterRegex;
-            UntilRegex = MergedExtractorChs.UntilRegex;
-            SincePrefixRegex = MergedExtractorChs.SincePrefixRegex;
-            SinceSuffixRegex = MergedExtractorChs.SinceSuffixRegex;
+            DateRegexList = ChineseDateExtractorConfiguration.DateRegexList;
+            NextRegex = ChineseDateExtractorConfiguration.NextRegex;
+            ThisRegex = ChineseDateExtractorConfiguration.ThisRegex;
+            LastRegex = ChineseDateExtractorConfiguration.LastRegex;
+            StrictWeekDayRegex = ChineseDateExtractorConfiguration.WeekDayRegex;
+            WeekDayOfMonthRegex = ChineseDateExtractorConfiguration.WeekDayOfMonthRegex;
+            BeforeRegex = ChineseMergedExtractorConfiguration.BeforeRegex;
+            AfterRegex = ChineseMergedExtractorConfiguration.AfterRegex;
+            UntilRegex = ChineseMergedExtractorConfiguration.UntilRegex;
+            SincePrefixRegex = ChineseMergedExtractorConfiguration.SincePrefixRegex;
+            SinceSuffixRegex = ChineseMergedExtractorConfiguration.SinceSuffixRegex;
         }
 
         public int TwoNumYear => int.Parse(DateTimeDefinitions.TwoNumYear);
@@ -50,8 +51,6 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
         public string LastMonthToken => DateTimeDefinitions.ParserConfigurationLastMonthToken;
 
         public string DatePrefix => DateTimeDefinitions.ParserConfigurationDatePrefix;
-
-        #region internalParsers
 
         public IDateTimeParser DateParser { get; }
 
@@ -71,10 +70,6 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
 
         public IDateTimeParser HolidayParser { get; }
 
-        #endregion
-
-        #region Dictionaries
-
         public ImmutableDictionary<string, string> UnitMap { get; }
 
         public ImmutableDictionary<string, long> UnitValueMap { get; }
@@ -92,10 +87,6 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
         public ImmutableDictionary<string, int> MonthOfYear { get; }
 
         public ImmutableDictionary<string, int> Numbers { get; }
-
-        #endregion
-
-        #region Regexes
 
         public IEnumerable<Regex> DateRegexList { get; }
 
@@ -119,16 +110,7 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
 
         public Regex SinceSuffixRegex { get; }
 
-        #endregion
-
-        private static ImmutableDictionary<string, int> InitNumbers()
-        {
-            return new Dictionary<string, int>
-            {
-            }.ToImmutableDictionary();
-        }
-
-        public int GetSwiftDay(string text)
+        public static int GetSwiftDay(string text)
         {
             var value = 0;
 
@@ -162,6 +144,13 @@ namespace Microsoft.Recognizers.Text.DateTime.Chinese
             }
 
             return value;
+        }
+
+        private static ImmutableDictionary<string, int> InitNumbers()
+        {
+            return new Dictionary<string, int>
+            {
+            }.ToImmutableDictionary();
         }
     }
 }

@@ -1,21 +1,14 @@
-﻿using Microsoft.Recognizers.Definitions;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Recognizers.Definitions;
 
 namespace Microsoft.Recognizers.Text.Sequence
 {
     public class BasePhoneNumberExtractor : BaseSequenceExtractor
     {
-        internal override ImmutableDictionary<Regex, string> Regexes { get; }
-
-        protected sealed override string ExtractType { get; } = Constants.SYS_PHONE_NUMBER;
-
-        private static List<char> BoundaryMarkers => BasePhoneNumbers.BoundaryMarkers.ToList();
-
-        private static List<char> SpecialBoundaryMarkers => BasePhoneNumbers.SpecialBoundaryMarkers.ToList();
+        private static readonly Regex InternationDialingPrefixRegex = new Regex(BasePhoneNumbers.InternationDialingPrefixRegex);
 
         public BasePhoneNumberExtractor()
         {
@@ -60,16 +53,19 @@ namespace Microsoft.Recognizers.Text.Sequence
                 {
                     new Regex(BasePhoneNumbers.SpecialPhoneNumberRegex),
                     Constants.PHONE_NUMBER_REGEX_SPECIAL
-                }
+                },
             };
 
             Regexes = regexes.ToImmutableDictionary();
         }
 
-        private bool CheckFormattedPhoneNumber(string phoneNumberText)
-        {
-            return Regex.IsMatch(phoneNumberText, BasePhoneNumbers.FormatIndicatorRegex);
-        }
+        internal override ImmutableDictionary<Regex, string> Regexes { get; }
+
+        protected sealed override string ExtractType { get; } = Constants.SYS_PHONE_NUMBER;
+
+        private static List<char> BoundaryMarkers => BasePhoneNumbers.BoundaryMarkers.ToList();
+
+        private static List<char> SpecialBoundaryMarkers => BasePhoneNumbers.SpecialBoundaryMarkers.ToList();
 
         public override List<ExtractResult> Extract(string text)
         {
@@ -83,21 +79,38 @@ namespace Microsoft.Recognizers.Text.Sequence
                     if (BoundaryMarkers.Contains(ch))
                     {
                         if (SpecialBoundaryMarkers.Contains(ch) &&
-                            CheckFormattedPhoneNumber(er.Text) && 
+                            CheckFormattedPhoneNumber(er.Text) &&
                             er.Start >= 2)
                         {
-                            var chGap = text[(int)(er.Start - 2)];
-                            if (!Char.IsNumber(chGap))
+                            var charGap = text[(int)(er.Start - 2)];
+                            if (!char.IsNumber(charGap) && !char.IsWhiteSpace(charGap))
                             {
                                 continue;
                             }
+
+                            // check the international dialing prefix
+                            var front = text.Substring(0, (int)(er.Start - 1));
+                            if (InternationDialingPrefixRegex.IsMatch(front))
+                            {
+                                var moveOffset = InternationDialingPrefixRegex.Match(front).Length + 1;
+                                er.Start = er.Start - moveOffset;
+                                er.Length = er.Length + moveOffset;
+                                er.Text = text.Substring((int)er.Start, (int)er.Length);
+                                continue;
+                            }
                         }
+
                         ers.Remove(er);
                     }
                 }
             }
 
             return ers;
+        }
+
+        private bool CheckFormattedPhoneNumber(string phoneNumberText)
+        {
+            return Regex.IsMatch(phoneNumberText, BasePhoneNumbers.FormatIndicatorRegex);
         }
     }
 }

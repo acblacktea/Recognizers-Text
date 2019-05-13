@@ -95,6 +95,16 @@ public class BaseDatePeriodExtractor implements IDateTimeExtractor {
     private List<Token> mergeTwoTimePoints(String input, LocalDateTime reference) {
         List<ExtractResult> ers = config.getDatePointExtractor().extract(input, reference);
 
+        // Handle "now"
+        Match[] matches = RegExpUtility.getMatches(this.config.getNowRegex(), input);
+        if (matches.length != 0) {
+            for (Match match : matches) {
+                ers.add(new ExtractResult(match.index, match.length, match.value, Constants.SYS_DATETIME_DATE));
+            }
+
+            ers.sort(Comparator.comparingInt(arg -> arg.getStart()));
+        }
+        
         return mergeMultipleExtractions(input, ers);
     }
 
@@ -125,8 +135,8 @@ public class BaseDatePeriodExtractor implements IDateTimeExtractor {
             }
 
             String middleStr = input.substring(middleBegin, middleEnd).trim().toLowerCase();
-            Optional<Match> match = Arrays.stream(RegExpUtility.getMatches(config.getTillRegex(), middleStr)).findFirst();
-            if (match.isPresent() && match.get().index == 0 && match.get().length == middleStr.length()) {
+
+            if (RegexExtension.isExactMatch(config.getTillRegex(), middleStr, true)) {
                 int periodBegin = thisResult.getStart();
                 int periodEnd = nextResult.getStart() + nextResult.getLength();
 
@@ -420,14 +430,6 @@ public class BaseDatePeriodExtractor implements IDateTimeExtractor {
         }
 
         return results;
-    }
-
-    private boolean matchSuffixRegexInSegment(String input, Optional<Match> match) {
-        return match.isPresent() && StringUtility.isNullOrWhiteSpace(input.substring(0, match.get().index));
-    }
-
-    private boolean matchPrefixRegexInSegment(String input, Optional<Match> match) {
-        return match.isPresent() && StringUtility.isNullOrWhiteSpace(input.substring(match.get().index + match.get().length));
     }
 
     private boolean isDateRelativeToNowOrToday(ExtractResult input) {

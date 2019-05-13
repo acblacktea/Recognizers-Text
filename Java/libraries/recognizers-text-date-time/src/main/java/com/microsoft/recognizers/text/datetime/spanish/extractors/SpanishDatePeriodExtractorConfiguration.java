@@ -76,6 +76,7 @@ public class SpanishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
     public static final Pattern LessThanRegex = RegExpUtility.getSafeRegExp(SpanishDateTime.LessThanRegex);
     public static final Pattern MoreThanRegex = RegExpUtility.getSafeRegExp(SpanishDateTime.MoreThanRegex);
     public static final Pattern CenturySuffixRegex = RegExpUtility.getSafeRegExp(SpanishDateTime.CenturySuffixRegex);
+    public static final Pattern NowRegex = RegExpUtility.getSafeRegExp(SpanishDateTime.NowRegex);
 
     public static final Iterable<Pattern> SimpleCasesRegexes = new ArrayList<Pattern>() {
         {
@@ -99,6 +100,7 @@ public class SpanishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
             add(YearPlusNumberRegex);
             add(DecadeWithCenturyRegex);
             add(RelativeDecadeRegex);
+            add(MonthOfRegex);
         }
     };
 
@@ -243,6 +245,11 @@ public class SpanishDatePeriodExtractorConfiguration extends BaseOptionsConfigur
     @Override
     public Pattern getCenturySuffixRegex() {
         return CenturySuffixRegex;
+    }
+
+    @Override
+    public Pattern getNowRegex() {
+        return NowRegex;
     }
 
     @Override

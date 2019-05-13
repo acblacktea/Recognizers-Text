@@ -21,7 +21,7 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         Regex NumberCombinedWithDateUnit { get; }
 
-        Regex PastRegex { get; }
+        Regex PreviousPrefixRegex { get; }
 
         Regex FutureRegex { get; }
 
@@ -55,6 +55,10 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         Regex CenturySuffixRegex { get; }
 
+        Regex MonthNumRegex { get; }
+
+        Regex NowRegex { get; }
+
         IDateExtractor DatePointExtractor { get; }
 
         IExtractor CardinalExtractor { get; }
@@ -65,12 +69,12 @@ namespace Microsoft.Recognizers.Text.DateTime
 
         IParser NumberParser { get; }
 
+        string[] DurationDateRestrictions { get; }
+
         bool GetFromTokenIndex(string text, out int index);
 
         bool HasConnectorToken(string text);
 
         bool GetBetweenTokenIndex(string text, out int index);
-
-        string[] DurationDateRestrictions { get; }
     }
 }

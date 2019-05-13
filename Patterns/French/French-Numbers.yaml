@@ -154,7 +154,7 @@ WrittenGroupSeparatorTexts: [point, points]
 WrittenIntegerSeparatorTexts: [et, '-']
 WrittenFractionSeparatorTexts: [et, sur]
 HalfADozenRegex: !simpleRegex
-  def: (?<=\b)+demi\s+douzaine
+  def: (?<=\b)demi\s+douzaine
 DigitalNumberRegex: !nestedRegex
   def: ((?<=\b)(cent|mille|million|millions|milliard|milliards|billions|billion|douzaine(s)?)(?=\b))|((?<=(\d|\b)){BaseNumbers.MultiplierLookupRegex}(?=\b))
   references: [ BaseNumbers.MultiplierLookupRegex ]
@@ -421,4 +421,14 @@ RoundNumberMap: !dictionary
     g: 1000000000
     b: 1000000000
     t: 1000000000000
+RelativeReferenceOffsetMap: !dictionary
+  types: [ string, string ]
+# TODO: modify below regex according to the counterpart in English
+  entries:
+    '': ''
+RelativeReferenceRelativeToMap: !dictionary
+  types: [ string, string ]
+# TODO: modify below regex according to the counterpart in English
+  entries:
+    '': ''
 ...

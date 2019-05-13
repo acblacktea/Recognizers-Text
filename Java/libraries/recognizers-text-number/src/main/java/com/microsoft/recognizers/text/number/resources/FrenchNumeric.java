@@ -206,7 +206,7 @@ public class FrenchNumeric {
 
     public static final List<String> WrittenFractionSeparatorTexts = Arrays.asList("et", "sur");
 
-    public static final String HalfADozenRegex = "(?<=\\b)+demi\\s+douzaine";
+    public static final String HalfADozenRegex = "(?<=\\b)demi\\s+douzaine";
 
     public static final String DigitalNumberRegex = "((?<=\\b)(cent|mille|million|millions|milliard|milliards|billions|billion|douzaine(s)?)(?=\\b))|((?<=(\\d|\\b)){BaseNumbers.MultiplierLookupRegex}(?=\\b))"
             .replace("{BaseNumbers.MultiplierLookupRegex}", BaseNumbers.MultiplierLookupRegex);
@@ -471,5 +471,13 @@ public class FrenchNumeric {
         .put("g", 1000000000L)
         .put("b", 1000000000L)
         .put("t", 1000000000000L)
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceOffsetMap = ImmutableMap.<String, String>builder()
+        .put("", "")
+        .build();
+
+    public static final ImmutableMap<String, String> RelativeReferenceRelativeToMap = ImmutableMap.<String, String>builder()
+        .put("", "")
         .build();
 }

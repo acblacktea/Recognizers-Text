@@ -113,7 +113,7 @@ class ChineseDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         return self._next_prefix_regex
 
     @property
-    def past_prefix_regex(self) -> Pattern:
+    def previous_prefix_regex(self) -> Pattern:
         return self._past_prefix_regex
 
     @property
@@ -160,6 +160,10 @@ class ChineseDatePeriodParserConfiguration(DatePeriodParserConfiguration):
     def unit_map(self) -> Dict[str, str]:
         return self._unit_map
 
+    @property
+    def now_regex(self) -> Pattern:
+        return self._now_regex
+
     def __init__(self):
         self._date_extractor = ChineseDateExtractor()
         self._date_parser = ChineseDateParser()
@@ -183,6 +187,7 @@ class ChineseDatePeriodParserConfiguration(DatePeriodParserConfiguration):
         self._cardinal_map = ChineseDateTime.ParserConfigurationCardinalMap
         self._season_map = ChineseDateTime.ParserConfigurationSeasonMap
         self._unit_map = ChineseDateTime.ParserConfigurationUnitMap
+        self._now_regex = RegExpUtility.get_safe_reg_exp(ChineseDateTime.NowRegex)
 
     def get_swift_day_or_month(self, source: str) -> int:
         source = source.strip().lower()
@@ -202,7 +207,7 @@ class ChineseDatePeriodParserConfiguration(DatePeriodParserConfiguration):
             return 0
         if regex.search(self.next_prefix_regex, source):
             return 1
-        if regex.search(self.past_prefix_regex, source):
+        if regex.search(self.previous_prefix_regex, source):
             return -1
         return 0
 
